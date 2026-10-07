@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Holiday Calendar 2026" />
+<title>Calendar - Spidy Study PYQS</title>
+<style>
+:root{--bg:#05060f;--surface:rgba(255,255,255,.06);--border:rgba(255,255,255,.12);--text:#eef2ff;--muted:#8b93a7;--violet:#a78bfa;--cyan:#22d3ee;--pink:#f472b6;--red:#ef4444;--radius:16px;--font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100vh;font-family:var(--font);color:var(--text);background:radial-gradient(1200px 700px at 80% -10%,rgba(124,58,237,.22),transparent 60%),radial-gradient(900px 600px at 0% 110%,rgba(6,182,212,.18),transparent 60%),var(--bg);overflow-x:hidden;line-height:1.5}
+
+.back{position:fixed;top:14px;left:14px;z-index:10;display:inline-flex;align-items:center;gap:.5rem;padding:.45rem .95rem;font-size:.8rem;font-weight:700;letter-spacing:.06em;color:var(--text);text-decoration:none;background:rgba(5,6,15,.7);border:1px solid var(--border);border-radius:999px;backdrop-filter:blur(10px);transition:border-color .25s,transform .25s}
+.back:hover{border-color:var(--violet);transform:translateX(-2px)}
+.back .ico{width:15px;height:15px}
+
+main{max-width:1120px;margin:0 auto;padding:4.5rem 1rem 3rem;text-align:center}
+h1{margin:0;font-size:clamp(1.7rem,5vw,2.6rem);letter-spacing:.02em}
+.sub{color:var(--muted);margin:.6rem 0 0;font-size:.95rem}
+.legend{display:flex;justify-content:center;align-items:center;gap:1.1rem;flex-wrap:wrap;margin:1.1rem 0 0;font-size:.8rem;color:var(--muted);font-weight:600;letter-spacing:.04em}
+.legend span.item{display:inline-flex;align-items:center;gap:.45rem}
+.sw{width:.85rem;height:.85rem;border-radius:5px;display:inline-block}
+.sw.red{background:var(--red);box-shadow:0 0 8px rgba(239,68,68,.6)}
+.sw.today{background:transparent;border:2px solid var(--cyan)}
+
+/* ---- month grid ---- */
+.months{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:1rem;margin-top:1.75rem;text-align:left}
+.month{padding:.95rem 1rem 1.05rem;border-radius:16px;border:1px solid var(--border);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));backdrop-filter:blur(12px);box-shadow:0 6px 18px rgba(0,0,0,.3);animation:rise .6s cubic-bezier(.22,.8,.28,1) backwards;animation-delay:calc(var(--i,0) * .05s)}
+.mname{font-size:.92rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--violet);margin-bottom:.65rem}
+.wk,.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.wk{margin-bottom:4px}
+.wk span{font-size:.66rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);text-align:center}
+.grid span{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:.8rem;border-radius:8px;background:rgba(255,255,255,.04);color:var(--text);position:relative}
+.grid span.pad{background:transparent}
+.grid span.hol{background:var(--red);color:#fff;font-weight:800;box-shadow:0 0 10px rgba(239,68,68,.55);cursor:default}
+.grid span.today{outline:2px solid var(--cyan);outline-offset:-2px}
+.grid span.hol.today{outline:2px solid var(--cyan)}
+
+/* ---- holidays table ---- */
+.hol-title{margin:2.75rem 0 .9rem;font-size:1.15rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.table-wrap{overflow-x:auto;text-align:left;border:1px solid var(--border);border-radius:14px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));backdrop-filter:blur(10px);box-shadow:0 6px 18px rgba(0,0,0,.3)}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th{text-align:left;padding:.7rem .95rem;font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);background:rgba(255,255,255,.05);border-bottom:1px solid var(--border)}
+td{padding:.62rem .95rem;border-bottom:1px solid rgba(255,255,255,.06);line-height:1.5}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:rgba(255,255,255,.04)}
+td.date{white-space:nowrap;font-weight:700}
+td.day{white-space:nowrap;color:var(--muted)}
+td.hol-name{color:#fca5a5;font-weight:600}
+
+/* ---- footer ---- */
+.site-footer{position:relative;z-index:1;margin-top:3rem;padding:1.5rem 1rem 2.25rem;text-align:center;color:var(--muted);font-size:.8rem;font-weight:700;letter-spacing:.28em;text-transform:uppercase;border-top:1px solid rgba(255,255,255,.06)}
+.footer-line{display:block;margin-top:.35rem;font-size:.95rem;letter-spacing:.34em;background:linear-gradient(90deg,var(--pink),var(--violet),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+.heart{display:inline-block;color:#f472b6;text-shadow:0 0 10px rgba(244,114,182,.8);animation:beat 1.6s ease-in-out infinite}
+@keyframes beat{0%,100%{transform:scale(1)}25%{transform:scale(1.18)}40%{transform:scale(1)}60%{transform:scale(1.12)}}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<a class="back" href="index.html"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg><span>Home</span></a>
+
+<main>
+  <h1>Calendar 2026</h1>
+  <p class="sub">All holidays are marked in <b style="color:#f87171">red</b> on the calendar.</p>
+  <div class="legend">
+    <span class="item"><span class="sw red"></span> Holiday</span>
+    <span class="item"><span class="sw today"></span> Today</span>
+  </div>
+
+  <section class="months" id="months" aria-label="2026 calendar"></section>
+
+  <h2 class="hol-title">Holidays</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Date</th><th>Day</th><th>Holiday</th></tr></thead>
+      <tbody id="holBody"></tbody>
+    </table>
+  </div>
+</main>
+
+<footer class="site-footer">
+  MADE FOR STUDENTS
+  <span class="footer-line">WITH <span class="heart" aria-hidden="true">&#10084;</span> BY SPIDY</span>
+</footer>
+
+<script>
+const YEAR = 2026;
+const HOLIDAYS = [
+  ['2026-01-26', 'Republic Day'],
+  ['2026-03-03', 'Holi'],
+  ['2026-03-21', 'Eid al-Fitr'],
+  ['2026-03-22', 'Bihar Divas'],
+  ['2026-03-27', 'Shri Ram Navami'],
+  ['2026-04-03', 'Good Friday'],
+  ['2026-05-01', 'May Day / Labour day'],
+  ['2026-05-27', 'Eid al-Zuha'],
+  ['2026-06-26', 'Muharram'],
+  ['2026-08-15', 'Independence Day'],
+  ['2026-09-04', 'Shri Krishna Janmashtami'],
+  ['2026-10-02', 'Mahatma Gandhi Jayanti'],
+  ['2026-10-20', 'Maha Navami'],
+  ['2026-11-08', 'Deepawali'],
+  ['2026-11-15', 'Vijaya Dashami'],
+  ['2026-11-15', 'Chhat Puja'],
+  ['2026-11-16', 'Chhat Puja'],
+  ['2026-12-25', 'Christmas']
+];
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const WEEK = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+
+const holMap = {};
+HOLIDAYS.forEach(([d, n]) => { (holMap[d] = holMap[d] || []).push(n); });
+
+const now = new Date();
+const pad = n => String(n).padStart(2, '0');
+const key = (y, m, d) => y + '-' + pad(m + 1) + '-' + pad(d);
+
+let html = '';
+for (let m = 0; m < 12; m++) {
+  const first = new Date(YEAR, m, 1).getDay();
+  const days = new Date(YEAR, m + 1, 0).getDate();
+  html += '<div class="month" style="--i:' + m + '">';
+  html += '<div class="mname">' + MONTHS[m] + '</div>';
+  html += '<div class="wk">' + WEEK.map(w => '<span>' + w + '</span>').join('') + '</div>';
+  html += '<div class="grid">';
+  for (let i = 0; i < first; i++) html += '<span class="pad"></span>';
+  for (let d = 1; d <= days; d++) {
+    const k = key(YEAR, m, d);
+    const names = holMap[k];
+    const cls = ['day'];
+    if (names) cls.push('hol');
+    if (now.getFullYear() === YEAR && now.getMonth() === m && now.getDate() === d) cls.push('today');
+    const t = names ? ' title="' + names.join(', ') + '"' : '';
+    html += '<span class="' + cls.join(' ') + '"' + t + '>' + d + '</span>';
+  }
+  html += '</div></div>';
+}
+document.getElementById('months').innerHTML = html;
+
+const fmtDate = dt => dt.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+const fmtDay = dt => dt.toLocaleDateString('en-US', { weekday: 'long' });
+document.getElementById('holBody').innerHTML = HOLIDAYS.map(([d, n]) => {
+  const [y, mo, da] = d.split('-').map(Number);
+  const dt = new Date(y, mo - 1, da);
+  return '<tr><td class="date">' + fmtDate(dt) + '</td><td class="day">' + fmtDay(dt) + '</td><td class="hol-name">' + n + '</td></tr>';
+}).join('');
+</script>
+</body>
+</html>

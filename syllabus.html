@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Syllabus - Spidy Study" />
+<title>Syllabus | Spidy Study</title>
+<style>
+
+
+
+/* =========================================================
+   0. DESIGN TOKENS + RESET
+   ========================================================= */
+:root{
+  --bg:            #05060f;
+  --border:        rgba(255,255,255,.12);
+  --text:          #eef2ff;
+  --muted:         #8b93a7;
+  --radius:        16px;
+  --header-h:      64px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+
+html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:var(--font);
+  color:var(--text);
+  background:
+    radial-gradient(1200px 700px at 80% -10%, rgba(124,58,237,.22), transparent 60%),
+    radial-gradient(900px 600px at 0% 110%, rgba(6,182,212,.18), transparent 60%),
+    var(--bg);
+  overflow-x:hidden;
+  line-height:1.5;
+}
+
+a{ color:inherit; text-decoration:none; }
+
+/* =========================================================
+   1. ANIMATED GRADIENT MESH BACKGROUND
+   ========================================================= */
+.mesh{ position:fixed; inset:0; z-index:-2; overflow:hidden; pointer-events:none; }
+
+.blob{
+  position:absolute;
+  width:46vw; height:46vw;
+  min-width:300px; min-height:300px;
+  border-radius:50%;
+  filter:blur(75px);
+  opacity:.45;
+  mix-blend-mode:screen;
+}
+.blob--violet{ top:-12%; left:-10%;
+  background:radial-gradient(circle at 35% 35%, #7c3aed, transparent 70%);
+  animation:drift-a 26s ease-in-out infinite alternate; }
+.blob--cyan{ top:10%; right:-15%;
+  background:radial-gradient(circle at 50% 50%, #06b6d4, transparent 70%);
+  animation:drift-b 32s ease-in-out infinite alternate; }
+.blob--pink{ bottom:-18%; left:15%;
+  background:radial-gradient(circle at 50% 50%, #ec4899, transparent 70%);
+  animation:drift-c 28s ease-in-out infinite alternate; }
+.blob--blue{ bottom:5%; right:5%;
+  background:radial-gradient(circle at 50% 50%, #2563eb, transparent 70%);
+  animation:drift-d 36s ease-in-out infinite alternate; }
+
+@keyframes drift-a{ from{transform:translate3d(0,0,0) scale(1)}      to{transform:translate3d(14vw,10vh,0) scale(1.2)} }
+@keyframes drift-b{ from{transform:translate3d(0,0,0) scale(1.05)}   to{transform:translate3d(-12vw,14vh,0) scale(.9)} }
+@keyframes drift-c{ from{transform:translate3d(0,0,0) scale(.95)}    to{transform:translate3d(10vw,-12vh,0) scale(1.25)} }
+@keyframes drift-d{ from{transform:translate3d(0,0,0) scale(1.1)}    to{transform:translate3d(-14vw,-8vh,0) scale(.95)} }
+
+/* =========================================================
+   2. GRID + DOT PATTERN OVERLAY
+   ========================================================= */
+.pattern{
+  position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background-image:
+    radial-gradient(rgba(255,255,255,.10) 1px, transparent 1px),
+    linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+  background-size:22px 22px, 88px 88px, 88px 88px;
+  -webkit-mask-image:radial-gradient(ellipse at 50% 35%, #000 25%, transparent 78%);
+          mask-image:radial-gradient(ellipse at 50% 35%, #000 25%, transparent 78%);
+}
+
+/* =========================================================
+   3. ENTRANCE ANIMATION
+   ========================================================= */
+@keyframes rise{
+  from{ opacity:0; transform:translateY(26px); }
+  to  { opacity:1; transform:translateY(0);    }
+}
+
+/* =========================================================
+   4. HEADER (glass bar)
+   ========================================================= */
+.site-header{
+  position:sticky; top:0; z-index:20;
+  height:var(--header-h);
+  padding:0 1.25rem;
+  display:flex; align-items:center;
+  background:rgba(10,12,24,.55);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+          backdrop-filter:blur(14px) saturate(140%);
+  border-bottom:1px solid var(--border);
+}
+.header-bar{
+  width:min(1100px, 100%);
+  margin-inline:auto;
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  gap:.5rem;
+}
+.back{
+  justify-self:start;
+  display:inline-flex; align-items:center; gap:.35rem;
+  font-size:.85rem; font-weight:700;
+  color:var(--muted);
+  padding:.4rem .7rem;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.05);
+  transition:color .25s, border-color .25s, box-shadow .25s, transform .25s;
+}
+.back:hover,.back:focus-visible{
+  color:#22d3ee;
+  border-color:rgba(34,211,238,.6);
+  box-shadow:0 0 16px -4px rgba(34,211,238,.7);
+  transform:translateY(-2px);
+}
+.brand{ display:flex; align-items:center; justify-content:center; gap:.6rem; }
+.header-bar > .spacer{ justify-self:end; }
+
+.spider{
+  width:36px; height:36px;
+  color:#22d3ee;
+  filter:drop-shadow(0 0 5px rgba(34,211,238,.9)) drop-shadow(0 0 16px rgba(167,139,250,.6));
+  animation:float 5s ease-in-out infinite;
+}
+@keyframes float{
+  0%,100%{ transform:translateY(0) rotate(-3deg); }
+  50%    { transform:translateY(-7px) rotate(3deg); }
+}
+.brand-name{
+  font-size:1rem; font-weight:800; letter-spacing:.02em;
+  text-shadow:0 0 18px rgba(167,139,250,.45);
+}
+
+/* =========================================================
+   5. LAYOUT
+   ========================================================= */
+.container{ width:min(1100px, 100% - 2.5rem); margin-inline:auto; position:relative; z-index:1; }
+main{ position:relative; z-index:1; }
+
+/* =========================================================
+   6. HERO
+   ========================================================= */
+.hero{
+  text-align:center;
+  padding:clamp(2.25rem, 7vw, 4rem) 0 clamp(1.25rem, 4vw, 2rem);
+}
+.hero h1{
+  margin:0 auto; max-width:16ch;
+  font-size:clamp(1.8rem, 6.5vw, 3.1rem);
+  font-weight:800; line-height:1.12; letter-spacing:-.02em;
+  background-image:linear-gradient(110deg,#a78bfa 0%,#22d3ee 45%,#f472b6 75%,#a78bfa 100%);
+  background-size:220% 100%;
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+  animation:rise .75s cubic-bezier(.22,.8,.28,1) .1s backwards,
+            gradient-pan 9s linear infinite;
+}
+@keyframes gradient-pan{ from{background-position:0% 50%} to{background-position:200% 50%} }
+.hero p{
+  margin:.9rem 0 0;
+  color:var(--muted);
+  font-size:clamp(.8rem, 2.4vw, .98rem);
+  font-weight:600; letter-spacing:.14em; text-transform:uppercase;
+  animation:rise .75s cubic-bezier(.22,.8,.28,1) .2s backwards;
+}
+
+/* =========================================================
+   7. STICKY SEMESTER TABS
+   ========================================================= */
+.tabs-bar{
+  position:sticky;
+  top:var(--header-h);
+  z-index:15;
+  padding:.45rem 0;
+}
+/* floating rounded "black bar" — curved left/right ends instead of a rectangle */
+.tabs{
+  width:max-content;
+  max-width:100%;
+  margin-inline:auto;
+  display:flex; flex-wrap:nowrap; gap:.5rem;
+  overflow-x:auto;
+  padding:.5rem .65rem;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:999px;
+  background:rgba(8,10,20,.78);
+  -webkit-backdrop-filter:blur(12px);
+          backdrop-filter:blur(12px);
+  box-shadow:0 14px 34px rgba(0,0,0,.5);
+  scrollbar-width:none;
+}
+.tabs::-webkit-scrollbar{ display:none; }
+.tab{
+  flex:0 0 auto;
+  font-size:.82rem; font-weight:800; letter-spacing:.03em;
+  padding:.42rem .85rem;
+  border-radius:999px;
+  color:var(--muted);
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.05);
+  transition:transform .25s, color .25s, border-color .25s, box-shadow .25s, background .25s;
+}
+.tab:hover,.tab:focus-visible{
+  color:var(--text);
+  border-color:rgba(255,255,255,.35);
+  transform:translateY(-2px);
+}
+/* CSS-only "active" tab when its section is the :target */
+body:has(#sem1:target) .tab[href="#sem1"]{ background:rgb(167 139 250); color:#05060f; border-color:rgb(167 139 250); box-shadow:0 0 18px rgb(167 139 250 / .55); }
+body:has(#sem2:target) .tab[href="#sem2"]{ background:rgb(34 211 238); color:#05060f; border-color:rgb(34 211 238); box-shadow:0 0 18px rgb(34 211 238 / .55); }
+body:has(#sem3:target) .tab[href="#sem3"]{ background:rgb(244 114 182); color:#05060f; border-color:rgb(244 114 182); box-shadow:0 0 18px rgb(244 114 182 / .55); }
+body:has(#sem4:target) .tab[href="#sem4"]{ background:rgb(163 230 53); color:#05060f; border-color:rgb(163 230 53); box-shadow:0 0 18px rgb(163 230 53 / .55); }
+body:has(#sem5:target) .tab[href="#sem5"]{ background:rgb(251 191 36); color:#05060f; border-color:rgb(251 191 36); box-shadow:0 0 18px rgb(251 191 36 / .55); }
+body:has(#sem6:target) .tab[href="#sem6"]{ background:rgb(251 146 60); color:#05060f; border-color:rgb(251 146 60); box-shadow:0 0 18px rgb(251 146 60 / .55); }
+body:has(#sem7:target) .tab[href="#sem7"]{ background:rgb(96 165 250); color:#05060f; border-color:rgb(96 165 250); box-shadow:0 0 18px rgb(96 165 250 / .55); }
+body:has(#sem8:target) .tab[href="#sem8"]{ background:rgb(45 212 191); color:#05060f; border-color:rgb(45 212 191); box-shadow:0 0 18px rgb(45 212 191 / .55); }
+
+/* prompt shown only until a semester is picked */
+.hint{
+  display:none;
+  margin:clamp(1.75rem, 5vw, 3rem) 0 4rem;
+  padding:clamp(2rem, 7vw, 3.25rem) 1.25rem;
+  text-align:center;
+  color:var(--muted);
+  font-size:clamp(.9rem, 3vw, 1.05rem);
+  font-weight:600;
+  letter-spacing:.02em;
+  border:1px dashed rgba(255,255,255,.16);
+  border-radius:24px;
+  background:rgba(255,255,255,.03);
+}
+.hint strong{ display:block; color:var(--text); font-size:1.05rem; margin-bottom:.3rem; }
+body:not(:has(.sem:target)) .hint{
+  display:block;
+  animation:rise .6s cubic-bezier(.22,.8,.28,1) .3s backwards;
+}
+
+/* =========================================================
+   8. SEMESTER SECTIONS + SUBJECT CARDS
+   ========================================================= */
+.sem-list{
+  display:flex;
+  flex-direction:column;
+  gap:clamp(1.25rem, 4vw, 2rem);
+  padding:clamp(1.5rem, 5vw, 2.5rem) 0 1.25rem;
+}
+
+.sem{
+  scroll-margin-top:calc(var(--header-h) + 72px);
+  padding:clamp(1rem, 3vw, 1.6rem);
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,.08);
+  background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+  -webkit-backdrop-filter:blur(10px);
+          backdrop-filter:blur(10px);
+  animation:rise .7s cubic-bezier(.22,.8,.28,1) calc(.3s + var(--i,1) * .06s) backwards;
+  transition:border-color .35s ease, box-shadow .35s ease;
+}
+
+/* glow the section that was navigated to */
+.sem:target{
+  border-color:rgb(var(--accent) / .55);
+  box-shadow:
+    0 0 0 1px rgb(var(--accent) / .3),
+    0 20px 45px rgba(0,0,0,.45),
+    0 0 45px -14px rgb(var(--accent) / .8);
+}
+
+/* show ONLY the semester the user picked (older browsers fall back to all) */
+body:has(.sem:target) .sem{ display:none; }
+body:has(.sem:target) .sem:target{
+  display:block;
+  animation:rise .55s cubic-bezier(.22,.8,.28,1) .05s backwards;
+}
+
+.sem-head{
+  display:flex; flex-wrap:wrap; align-items:center; gap:.7rem;
+  margin-bottom:1.1rem;
+}
+.sem-head h2{
+  margin:0;
+  font-size:clamp(1.15rem, 4vw, 1.5rem);
+  font-weight:800; letter-spacing:-.01em;
+  color:rgb(var(--accent));
+  text-shadow:0 0 22px rgb(var(--accent) / .55);
+}
+.sem:target .sem-head h2{ text-shadow:0 0 26px rgb(var(--accent) / .95); }
+.sem-count{
+  font-size:.72rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--muted);
+  padding:.2rem .6rem;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.05);
+}
+
+/* note + two-column result table */
+.note{
+  margin:0 0 1.35rem;
+  padding:.85rem 1rem;
+  font-size:.86rem; line-height:1.6;
+  color:#fcd34d;
+  background:rgba(253,224,71,.07);
+  border:1px solid rgba(253,224,71,.3);
+  border-radius:12px;
+}
+.res-title{
+  margin:0 0 .3rem;
+  font-size:clamp(1.15rem, 4vw, 1.5rem);
+  font-weight:800; letter-spacing:.14em; text-transform:uppercase;
+}
+.res-branch{
+  margin:0 0 1rem;
+  color:var(--muted);
+  font-size:.92rem; font-weight:600; letter-spacing:.04em;
+}
+.table-wrap{
+  overflow-x:auto;
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+  -webkit-backdrop-filter:blur(10px);
+          backdrop-filter:blur(10px);
+  box-shadow:0 6px 18px rgba(0,0,0,.3);
+}
+.res-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:.92rem;
+}
+.res-table th{
+  text-align:left;
+  padding:.7rem .9rem;
+  font-size:.72rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--muted);
+  background:rgba(255,255,255,.05);
+  border-bottom:1px solid var(--border);
+}
+.res-table td{
+  padding:.62rem .9rem;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  line-height:1.55;
+}
+.res-table tbody tr:last-child td{ border-bottom:none; }
+.res-table tbody tr:hover td{ background:rgba(255,255,255,.04); }
+.res-table .tcode{
+  width:1%; white-space:nowrap;
+  font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-weight:700; letter-spacing:.05em;
+  color:#a78bfa;
+}
+.old{
+  background:#fde047;
+  color:#111;
+  font-weight:700;
+  padding:.06rem .34rem;
+  border-radius:5px;
+  box-decoration-break:clone;
+  -webkit-box-decoration-break:clone;
+}
+/* year = paper button (black pill, white bold label, white border) */
+.years{ display:flex; flex-wrap:wrap; gap:.45rem; }
+.years a{
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:.72rem; font-weight:800; letter-spacing:.05em;
+  line-height:1;
+  padding:.5rem .78rem;
+  color:#ffffff;
+  background:#000000;
+  border:1px solid #ffffff;
+  border-radius:999px;
+  box-shadow:
+    0 8px 18px -12px rgba(255,255,255,.4),
+    inset 0 1px 0 rgba(255,255,255,.45);
+  transition:transform .25s ease, box-shadow .25s ease, filter .25s ease;
+}
+.years a:hover,
+.years a:focus-visible{
+  transform:translateY(-3px) scale(1.07);
+  filter:brightness(1.07) saturate(1.06);
+  box-shadow:
+    0 0 22px -4px rgba(255,255,255,.95),
+    0 12px 24px -14px rgba(255,255,255,1),
+    inset 0 1px 0 rgba(255,255,255,.55);
+}
+.years a:active{ transform:translateY(-1px) scale(1.02); }
+.years a:focus-visible{
+  outline:2px solid #ffffff;
+  outline-offset:2px;
+}
+
+/* =========================================================
+   9. BACK CTA + FOOTER
+   ========================================================= */
+.back-cta{
+  display:inline-flex; align-items:center; gap:.55rem;
+  width:max-content;
+  margin:0 0 3rem;            /* sits at the left of the column, not centred */
+  line-height:1;
+  font-size:.9rem; font-weight:800;
+  color:var(--text);
+  padding:.75rem 1.4rem;
+  border-radius:999px;
+  border:1px solid transparent;
+  background:
+    linear-gradient(rgba(255,255,255,.07), rgba(255,255,255,.03)) padding-box,
+    linear-gradient(120deg, rgba(167,139,250,.8), rgba(34,211,238,.7), rgba(244,114,182,.8)) border-box;
+  transition:transform .3s, box-shadow .3s;
+}
+.ico{
+  display:block; flex:none;      /* svg box centres optically with the label */
+  width:15px; height:15px;
+  color:currentColor;
+  transform:translateY(-1px);    /* nudge icon onto the text's optical centre */
+}
+.back-cta:hover,.back-cta:focus-visible{
+  transform:translateY(-3px);
+  box-shadow:0 0 26px -6px rgba(167,139,250,.9);
+}
+
+.site-footer{
+  position:relative; z-index:1;
+  padding:1.5rem 1rem 2.25rem;
+  text-align:center;
+  color:var(--muted);
+  font-size:.8rem; font-weight:700;
+  letter-spacing:.28em; text-transform:uppercase;
+  border-top:1px solid rgba(255,255,255,.06);
+  animation:rise .7s cubic-bezier(.22,.8,.28,1) .8s backwards;
+}
+.footer-line{
+  display:block; margin-top:.35rem;
+  font-size:.95rem; letter-spacing:.34em;
+  background:linear-gradient(90deg,#f472b6,#a78bfa,#22d3ee);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.heart{
+  display:inline-block;
+  color:#f472b6;
+  text-shadow:0 0 10px rgba(244,114,182,.8);
+  animation:beat 1.6s ease-in-out infinite;
+}
+@keyframes beat{
+  0%,100%{ transform:scale(1); }
+  25%    { transform:scale(1.18); }
+  40%    { transform:scale(1); }
+  60%    { transform:scale(1.12); }
+}
+
+/* =========================================================
+   10. RESPONSIVE (mobile-first)
+   ========================================================= */
+@media (min-width:600px){
+  .tabs{ flex-wrap:wrap; justify-content:center; overflow:visible; }
+}
+@media (min-width:980px){
+  .brand-name{ font-size:1.1rem; }
+}
+
+/* =========================================================
+   11. REDUCED MOTION
+   ========================================================= */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+    scroll-behavior:auto !important;
+  }
+}
+
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem 0 1.5rem;
+}
+.pill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.42rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.05);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 14px 34px rgba(0,0,0,.5);
+}
+select {
+  background: transparent;
+  color: var(--text);
+  border: none;
+  outline: none;
+  font-weight: 800;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+select option {
+  background: #05060f;
+  color: var(--text);
+}
+.hidden { display: none !important; }
+.results { padding-bottom: 2rem; }
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem 0 1.5rem;
+}
+.pill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.42rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.05);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 14px 34px rgba(0,0,0,.5);
+}
+select {
+  background: transparent;
+  color: var(--text);
+  border: none;
+  outline: none;
+  font-weight: 800;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+select option {
+  background: #05060f;
+  color: var(--text);
+}
+.hidden { display: none !important; }
+.results { padding-bottom: 2rem; }
+</style>
+</head>
+<body>
+  <div class="mesh" aria-hidden="true">
+    <span class="blob blob--violet"></span>
+    <span class="blob blob--cyan"></span>
+    <span class="blob blob--pink"></span>
+    <span class="blob blob--blue"></span>
+  </div>
+  <div class="pattern" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="header-bar">
+      <a class="back" href="index.html"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg><span>Home</span></a>
+      <div class="brand">
+        <svg class="spider" viewBox="0 0 64 64" role="img" aria-label="Spider icon">
+          <g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+            <path d="M25 31 C17 29 12 23 7 18"/><path d="M25 35 C15 35 10 33 5 30"/><path d="M25 39 C15 41 10 45 6 50"/><path d="M25 43 C17 47 13 53 10 58"/>
+            <path d="M39 31 C47 29 52 23 57 18"/><path d="M39 35 C49 35 54 33 59 30"/><path d="M39 39 C49 41 54 45 58 50"/><path d="M39 43 C47 47 51 53 54 58"/>
+          </g>
+          <ellipse cx="32" cy="39" rx="7.5" ry="9" fill="currentColor"/><circle cx="32" cy="28" r="5" fill="currentColor"/><circle cx="30" cy="27" r="1" fill="#05060f"/><circle cx="34" cy="27" r="1" fill="#05060f"/>
+        </svg>
+        <span class="brand-name">Spidy Study</span>
+      </div>
+      <span class="spacer" aria-hidden="true"></span>
+    </div>
+  </header>
+  <main class="container">
+    <section class="hero">
+      <h1>Syllabus</h1>
+      <p>Branch wise subject list</p>
+    </section>
+    <div class="filters">
+      <div class="pill">
+        <select id="branchSelect">
+          <option value="">Select Your Branch</option>
+          <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+          <option value="Electronic and communication Engineering">Electronic and communication Engineering</option>
+          <option value="Civil Engineering">Civil Engineering</option>
+          <option value="Electrical & Electronics Engineering">Electrical & Electronics Engineering</option>
+          <option value="Electrical Engineering">Electrical Engineering</option>
+          <option value="Mechanical Engineering">Mechanical Engineering</option>
+          <option value="Others">Others</option>
+        </select>
+      </div>
+      <div class="pill">
+        <select id="semSelect" disabled>
+          <option value="">Select Your Semester</option>
+          <option value="1">Semester 1</option>
+          <option value="2">Semester 2</option>
+          <option value="3">Semester 3</option>
+          <option value="4">Semester 4</option>
+          <option value="5">Semester 5</option>
+          <option value="6">Semester 6</option>
+          <option value="7">Semester 7</option>
+          <option value="8">Semester 8</option>
+        </select>
+      </div>
+    </div>
+    <div id="results" class="results hidden"></div>
+    <a class="back-cta" href="index.html"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg><span>Back to home</span></a>
+  </main>
+  <footer class="site-footer">
+    MADE FOR STUDENTS
+    <span class="footer-line">WITH <span class="heart" aria-hidden="true">&#10084;</span> BY SPIDY</span>
+  </footer>
+  <script>
+    const data = {"Mechanical Engineering":{"1":[{"code":"100101","names":["BASIC ELECTRICAL ENGINEERING (OLD)","Engineering Chemistry (24)","Communication Skills (26)"]},{"code":"100102","names":["ENGINEERING GRAPHICS & DESIGN (OLD)","Engineering Mathematics-I (24+26)"]},{"code":"100103","names":["Communicative English (24)","Engineering Chemistry (26)"]},{"code":"100104","names":["Engineering Graphics and Design (24)"]},{"code":"100105","names":["Introduction to AI (26)"]},{"code":"100106","names":["Basic Electrical Engineering (24)"]},{"code":"100107","names":["Engineering Graphics and Design (26)"]},{"code":"102101","names":["PHYSICS (ELECTROMAGNETISM) (OLD)"]},{"code":"102102","names":["MATHEMATICS-I (CALCULUS AND LINEAR ALGEBRA) (OLD)"]}],"2":[{"code":"100201","names":["Engineering Physics"]},{"code":"100202","names":["Engineering Mathematics-II"]},{"code":"100203","names":["CHEMISTRY (OLD)","Programming for Problem Solving"]},{"code":"100204","names":["PROGRAMMING FOR PROBLEM SOLVING (OLD)","Elements of Mechanical Engineering"]},{"code":"100205","names":["WORKSHOP MANUFACTURING PRACTICES (OLD)"]},{"code":"100206","names":["ENGLISH (OLD)","Workshop Practices"]},{"code":"102202","names":["MATHEMATICS-II (ODE & COMPLEX VARIABLES) (OLD)"]}],"3":[{"code":"100301","names":["BIOLOGY FOR ENGINEERS (OLD)"]},{"code":"100303","names":["BASIC ELECTRONICS ENGINEERING (OLD)"]},{"code":"100309","names":["ENGINEERING MECHANICS (OLD)"]},{"code":"100312","names":["MATHEMATICS-III (PDE, PROBABILILTY AND STATISTICS) (OLD)"]},{"code":"102301","names":["Engineering Mechanics"]},{"code":"102302","names":["Material Science and Engineering"]},{"code":"102303","names":["Engineering Mathematics-III (PDE, Probability and Statistics)"]},{"code":"102304","names":["THERMODYNAMICS (OLD)","Thermodynamics"]},{"code":"102305","names":["Basic Electronics Engineering"]},{"code":"102306","names":["Universal Human Values"]},{"code":"160301","names":["Engineering Mechanics"]},{"code":"160302","names":["Material Science and Engineering"]},{"code":"160303","names":["Engineering Mathematics-III (PDE, Prob/Stat)"]},{"code":"160304","names":["Thermodynamics"]},{"code":"160305","names":["Basic Electronics Engineering"]},{"code":"160306","names":["Universal Human Values"]}],"4":[{"code":"102401","names":["Applied Thermodynamics (OLD)","Applied Thermodynamics"]},{"code":"102402","names":["Engineering Materials (OLD)","Fluid Mechanics and Hydraulic Machines"]},{"code":"102403","names":["Fluid Mechanics (OLD)","Strength of Material"]},{"code":"102404","names":["Instrumentation & Control (OLD)","Kinematics of Machine"]},{"code":"102405","names":["Strength of Materials (OLD)","Project Management"]}],"5":[{"code":"102501","names":["Fluid Machinery"]},{"code":"102502","names":["Heat Transfer"]},{"code":"102503","names":["Kinematics of Machine"]},{"code":"102504","names":["Manufacturing Processes"]}],"6":[{"code":"102601","names":["Design of Machine Elements"]},{"code":"102602","names":["Dynamics of Machinery"]},{"code":"102603","names":["Manufacturing Technology"]},{"code":"102605","names":["Automation in Manufacturing"]},{"code":"102606","names":["Process Planning and Cost Estimation"]},{"code":"102607","names":["Mechatronic systems"]},{"code":"102608","names":["Microprocessor in Automation"]},{"code":"102609","names":["Composite Materials"]},{"code":"102610","names":["Power Plant Engineering"]},{"code":"102611","names":["Renewable Energy Systems"]}],"7":[{"code":"102701","names":["Internal Combustion Engines"]},{"code":"102702","names":["Refrigeration and Air Conditioning"]},{"code":"102703","names":["Computer Aided Design"]},{"code":"102705","names":["Automobile Engineering"]},{"code":"102706","names":["Operations Research"]}],"8":[{"code":"100808","names":["Total Quality Management"]},{"code":"102801","names":["Principles of Management"]},{"code":"102802","names":["Design of Transmission Systems"]},{"code":"102804","names":["Energy Conservation and Management"]},{"code":"102805","names":["Gas Dynamics and Jet Propulsion"]},{"code":"102806","names":["Computational Fluid Dynamics"]},{"code":"102807","names":["Safety Management"]},{"code":"102808","names":["Non-Conventional Manufacturing"]}]},"Electronic and communication Engineering":{"1":[{"code":"100101","names":["Communication Skills (26)"]},{"code":"100102","names":["Engineering Mathematics-I (24+26)"]},{"code":"100103","names":["CHEMISTRY (OLD)"]},{"code":"100104","names":["PROGRAMMING FOR PROBLEM SOLVING (OLD)","Engineering Physics (26)"]},{"code":"100105","names":["WORKSHOP MANUFACTURING PRACTICES (OLD)","Introduction to AI (26)"]},{"code":"100106","names":["ENGLISH (OLD)","Basic Electrical Engineering (24+26)"]},{"code":"100110","names":["Engineering Physics (24)"]},{"code":"100111","names":["Programming for Problem Solving (24)"]},{"code":"100112","names":["Workshop Practices (24)"]},{"code":"103102","names":["MATHEMATICS-I (CALCULUS AND DIFFERENTIAL EQUATIONS) (OLD)"]}],"2":[{"code":"100201","names":["BASIC ELECTRICAL ENGINEERING (OLD)"]},{"code":"100202","names":["ENGINEERING GRAPHICS & DESIGN (OLD)","Engineering Mathematics-II"]},{"code":"100209","names":["Basic Electronics"]},{"code":"100215","names":["Engineering Chemistry"]},{"code":"100216","names":["Communicative English"]},{"code":"100217","names":["Engineering Graphics & Design"]},{"code":"103201","names":["PHYSICS (WAVE AND OPTICS AND INTRODUCTION TO QUANTUM MECHANICS) (OLD)"]},{"code":"103202","names":["MATHEMATICS-II (LINEAR ALGEBRA, TRANSFORM CALCULUS AND NUMERICAL METHODS) (OLD)"]}],"3":[{"code":"100313","names":["OBJECT ORIENTED PROGRAMMING USING C++ (OLD)"]},{"code":"104301","names":["BASIC ELECTRONICS (OLD)","Electronic Devices and Circuit Theory"]},{"code":"104302","names":["ELECTRICAL & ELECTRONIC MATERIAL (OLD)","Object Oriented Programming"]},{"code":"104303","names":["MATHEMATICS-III (OLD)","Network Theory"]},{"code":"104304","names":["NETWORK THEORY (OLD)","Signal & System"]},{"code":"104305","names":["SIGNALS AND SYSTEMS (OLD)","Engineering Mathematics-III (PDE, Prob/stat)"]},{"code":"104306","names":["Universal Human Values"]},{"code":"104307","names":["Indian Knowledge System"]},{"code":"159301","names":["Network Theory (OLD)","Electronic Devices and Circuit Theory"]},{"code":"159302","names":["Singnals and Systems (OLD)","Object Oriented Programming"]},{"code":"159303","names":["Mathematics-III (OLD)","Network Theory"]},{"code":"159304","names":["Object Oriented Programming (OLD)","Signal & System"]},{"code":"159305","names":["Basic Electronics (OLD)","Engineering Mathematics-III (PDE, Prob/Stat)"]},{"code":"159306","names":["Electrical and Electronic Material (OLD)","Universal Human Values"]},{"code":"163301","names":["Object Oriented Programming Using C++ (OLD)","Electronic Devices and Circuit Theory"]},{"code":"163302","names":["Basic Electronics (OLD)","Object Oriented Programming"]},{"code":"163303","names":["Electrical and Electronic Material (OLD)","Network Theory"]},{"code":"163304","names":["Mathematics-III (OLD)","Signal & System"]},{"code":"163305","names":["Network Theory (OLD)","Engineering Mathematics-III (PDE, Prob/Stat)"]},{"code":"163306","names":["Signals and systems (OLD)","Universal Human Values"]}],"4":[{"code":"104401","names":["Analog Circuits (OLD)"]},{"code":"104402","names":["Analog Communication (OLD)"]},{"code":"104403","names":["Digital Circuits (OLD)"]},{"code":"104404","names":["Electromagnetic Theory (OLD)"]},{"code":"104405","names":["Semiconductor Physics and Devices (OLD)"]}],"5":[{"code":"104501","names":["Computer Networks and Security"]},{"code":"104502","names":["Digital Signal Processing"]},{"code":"104503","names":["Linear Control Systems"]},{"code":"104504","names":["Linear Integrated Circuits and Applications"]},{"code":"104505","names":["Microprocessors and Microcontrollers"]},{"code":"104506","names":["Probability Theory and Stochastic Processes"]},{"code":"159501","names":["Digital Signal Processing"]},{"code":"159502","names":["Linear Integrated Circuits and Applications"]},{"code":"159503","names":["Microprocessors and Microcontrollers"]},{"code":"159504","names":["CMOS Integrated Circuits"]},{"code":"159505","names":["Introduction to VLSI Life Cycle"]},{"code":"159506","names":["Linear Control System"]},{"code":"163501","names":["Computer Networks and Security"]},{"code":"163502","names":["Digital Signal Processing"]},{"code":"163503","names":["Linear Control Systems"]},{"code":"163504","names":["Antenna & Radio Wave Propagation"]},{"code":"163505","names":["Microprocessors and Microcontrollers"]},{"code":"163506","names":["Probability Theory and Stochastic Processes"]}],"6":[{"code":"100601","names":["Biology for Engineers"]},{"code":"100614","names":["Digital Image & Video Processing"]},{"code":"104601","names":["Computer Organization and Architecture"]},{"code":"104602","names":["Digital Communication"]},{"code":"104604","names":["Electronics Instruments and Measurement"]},{"code":"104606","names":["Digital CMOS VLSI Design"]},{"code":"104607","names":["Scientific computing"]}],"7":[{"code":"100710","names":["Antennas and Wave Propagation"]},{"code":"104701","names":["Business Analytics"]},{"code":"104702","names":["Cost Management of Engineering Projects"]},{"code":"104703","names":["Wireless Communication"]},{"code":"104705","names":["Optical Fiber Communications"]},{"code":"104706","names":["Micro- and Nano-electronics"]},{"code":"104708","names":["High Speed Electronics"]},{"code":"104709","names":["Digital System Design"]},{"code":"104710","names":["VLSI Technology"]},{"code":"104711","names":["Information and Coding Theory"]}],"8":[{"code":"100806","names":["Microwave Theory and Techniques"]},{"code":"100814","names":["Internet of Things"]},{"code":"100818","names":["BioMedical Instrumentation"]},{"code":"100819","names":["Satellite Communication"]},{"code":"104801","names":["Error correcting codes"]},{"code":"104804","names":["Wireless Sensor and Networks"]},{"code":"104806","names":["Analog CMOS VLSI Design"]},{"code":"104808","names":["Machine Learning"]},{"code":"104809","names":["Introduction to MEMS"]},{"code":"104810","names":["Power Electronics"]},{"code":"104812","names":["Transducers and Sensors"]}]},"Computer Science & Engineering":{"1":[{"code":"100102","names":["Engineering Mathematics-1 (24)","Engineering Mathematics-1 (26)"]},{"code":"100103","names":["CHEMISTRY (OLD)"]},{"code":"100104","names":["PROGRAMMING FOR PROBLEM SOLVING (OLD)","Engineering Physics (26)"]},{"code":"100105","names":["WORKSHOP MANUFACTURING PRACTICES (OLD)","Introduction to AI (26)"]},{"code":"100106","names":["ENGLISH (OLD)"]},{"code":"100108","names":["Computer Fundamentals & Emerging Technologies (26)"]},{"code":"100109","names":["Universal Human Values (26)"]},{"code":"100110","names":["Engineering Physics (24)","Essence of Indian Constitution (26)"]},{"code":"100111","names":["Programming for Problem Solving (24)","Basics of Electrical & Electronics Engineering (26)"]},{"code":"100113","names":["IT Workshop (24)"]},{"code":"100114","names":["Basic Electronics Engineering (24)"]},{"code":"105102","names":["MATHEMATICS-I (CALCULUS AND LINEAR ALGEBRA) (OLD)"]}],"2":[{"code":"100201","names":["BASIC ELECTRICAL ENGINEERING (OLD)"]},{"code":"100202","names":["ENGINEERING GRAPHICS & DESIGN (OLD)","Engineering Mathematics-II"]},{"code":"100215","names":["Engineering Chemistry"]},{"code":"100216","names":["Communicative English"]},{"code":"100218","names":["Python Programming"]},{"code":"100219","names":["Introduction to Web Design"]},{"code":"105201","names":["PHYSICS (SEMICONDUCTOR PHYSICS) (OLD)"]},{"code":"105202","names":["MATHEMATICS-II (PROBABILITY AND STATISTICS) (OLD)"]}],"3":[{"code":"100302","names":["ANALOG ELECTRONIC CIRCUITS (OLD)"]},{"code":"100304","names":["DATA STRUCTURE & ALGORITHMS (OLD)"]},{"code":"100311","names":["MATHEMATICS-III (DIFFERENTIAL CALCULUS) (OLD)"]},{"code":"100313","names":["OBJECT ORIENTED PROGRAMMING USING C++ (OLD)"]},{"code":"100314","names":["TECHNICAL WRITING (OLD)"]},{"code":"105301","names":["Digital Electronics"]},{"code":"105302","names":["Data Structure & Algorithms"]},{"code":"105303","names":["Object Oriented Programming using JAVA"]},{"code":"105304","names":["Discrete Mathematics and Graph Theory"]},{"code":"105305","names":["Operating System"]},{"code":"105306","names":["Universal Human Values"]},{"code":"105307","names":["Indian Knowledge System"]},{"code":"151301","names":["Digital Electronics"]},{"code":"151302","names":["Data Structure and Algorithms"]},{"code":"151303","names":["Object Oriented Programming using JAVA"]},{"code":"151304","names":["Discrete Mathematics and Graph Theory"]},{"code":"151305","names":["Operating System"]},{"code":"151306","names":["Universal Human Values"]},{"code":"152301","names":["Digital Electronics"]},{"code":"152302","names":["Data Structure and Algorithms"]},{"code":"152303","names":["Object Oriented Programming using JAVA"]},{"code":"152304","names":["Discrete Mathematics and Graph Theory"]},{"code":"152305","names":["Operating System"]},{"code":"152306","names":["Universal Human Values"]},{"code":"153301","names":["Digital Electronics"]},{"code":"153302","names":["Data Structure and Algorithms"]},{"code":"153303","names":["Object Oriented Programming using JAVA"]},{"code":"153304","names":["Discrete Mathematics and Graph Theory"]},{"code":"153305","names":["Operating System"]},{"code":"153306","names":["Universal Human Values"]},{"code":"154301","names":["Digital Electronics"]},{"code":"154302","names":["Data Structure and Algorithms"]},{"code":"154303","names":["Object Oriented Programming using JAVA"]},{"code":"154304","names":["Discrete Mathematics and Graph Theory"]},{"code":"154305","names":["Operating System"]},{"code":"154306","names":["Universal Human Values"]},{"code":"155301","names":["Digital Electronics"]},{"code":"155302","names":["Data Structure and Algorithms"]},{"code":"155303","names":["Object Oriented Programming using JAVA"]},{"code":"155304","names":["Discrete Mathematics and Graph Theory"]},{"code":"155305","names":["Operating System"]},{"code":"155306","names":["Universal Human Values"]},{"code":"156301","names":["Digital Electronics"]},{"code":"156302","names":["Data Structure and Algorithm"]},{"code":"156303","names":["Object Oriented Programming using JAVA"]},{"code":"156304","names":["Discrete Mathematics and Graph Theory"]},{"code":"156305","names":["Operating System"]},{"code":"156306","names":["Universal Human Values"]},{"code":"157301","names":["Digital Electronics"]},{"code":"157302","names":["Data Structure and Algorithms"]},{"code":"157303","names":["Object Oriented Programming using JAVA"]},{"code":"157304","names":["Discrete Mathematics and Graph Theory"]},{"code":"157305","names":["Operating Systems"]},{"code":"157306","names":["Universal Human Values"]}],"4":[{"code":"100403","names":["Digital Electronics (OLD)"]},{"code":"100404","names":["Discrete Mathematics (OLD)"]},{"code":"100407","names":["Human Resource Development and Organizational Behavior (OLD)"]},{"code":"105401","names":["Computer Organization & Architecture (OLD)","Computer Organization and Architecture"]},{"code":"105402","names":["Design & Analysis of Algorithms (OLD)","Formal Language and Automata Theory"]},{"code":"105403","names":["Operating Systems (OLD)","Design and Analysis of Algorithms"]},{"code":"105404","names":["Database Management System"]},{"code":"105405","names":["Effective Technical Communication"]},{"code":"105406","names":["Computer Networks"]}],"5":[{"code":"100508","names":["Professional Skill Development"]},{"code":"105501","names":["Artificial intelligence"]},{"code":"105502","names":["Database Management Systems"]},{"code":"105503","names":["Formal Language & Automata Theory"]},{"code":"105504","names":["Software Engineering"]},{"code":"105505","names":["Seminar"]},{"code":"151501","names":["Emerging Web Technology"]},{"code":"151502","names":["Database Management System"]},{"code":"151503","names":["Artificial Intelligence"]},{"code":"151504","names":["Artificial Neural Network"]},{"code":"151509","names":["Computer Network"]},{"code":"152501","names":["Artificial Intelligence"]},{"code":"152502","names":["Automata Theory & Compiler Design"]},{"code":"152503","names":["Database Management System"]},{"code":"152504","names":["Computer Network"]},{"code":"152506","names":["Graph Theory"]},{"code":"152507","names":["Internet of Things"]},{"code":"152509","names":["E-Commerce and ERP"]},{"code":"153501","names":["Machine Learning"]},{"code":"153502","names":["Database Management System"]},{"code":"153503","names":["Computer Networks"]},{"code":"153504","names":["Python Programming"]},{"code":"153506","names":["Artificial Intelligence"]},{"code":"153508","names":["Formal Language & Automata Theory"]},{"code":"153510","names":["Software Engineering"]},{"code":"154501","names":["IoT Architecture & Design"]},{"code":"154502","names":["Database Management System"]},{"code":"154503","names":["Computer Networks"]},{"code":"154504","names":["Cryptography and Network Security"]},{"code":"154508","names":["Emerging Web Technology"]},{"code":"154509","names":["Software Engineering"]},{"code":"155501","names":["IoT Architecture & Design"]},{"code":"155502","names":["Database Management System"]},{"code":"155503","names":["Artificial Intelligence"]},{"code":"155504","names":["Cryptography and Network Security"]},{"code":"155510","names":["Software Engineering"]},{"code":"156501","names":["Database Management System"]},{"code":"156502","names":["Computer Network"]},{"code":"156503","names":["Automata Theory & Compiler Design"]},{"code":"156504","names":["Cryptography and Network Security"]},{"code":"156510","names":["Internet of Things"]},{"code":"157501","names":["Database Management System"]},{"code":"157502","names":["Artificial Intelligence"]},{"code":"157503","names":["Computer Network"]},{"code":"157504","names":["Machine Learning"]},{"code":"157507","names":["Software Engineering"]},{"code":"157510","names":["Artificial Neural Network"]}],"6":[{"code":"100602","names":["Computer Networks"]},{"code":"100610","names":["Computer Graphics"]},{"code":"105601","names":["Compiler Design"]},{"code":"105602","names":["Machine Learning"]},{"code":"105604","names":["Graph Theory"]},{"code":"105606","names":["Introduction To Java Programming Language"]},{"code":"105610","names":["Soft Computing"]},{"code":"105611","names":["Distributed Database"]},{"code":"105612","names":["Advanced Data Structures and Algorithms"]},{"code":"105613","names":["Advance Java Programming Language"]},{"code":"105614","names":["Web and Internet Technology"]},{"code":"105616","names":["Cryptography and Network Security"]},{"code":"105617","names":["Mobile and Wireless Computing"]},{"code":"151601","names":["Machine Learning"]},{"code":"151602","names":["Automata Theory and Compiler Design"]},{"code":"151603","names":["Ad hoc & Network Sensors"]},{"code":"151604","names":["AI and Ethics"]},{"code":"151610","names":["Internet & Intranet Engineering"]},{"code":"151614","names":["Cloud Computing"]},{"code":"151615","names":["E-Commerce and ERP"]},{"code":"152601","names":["Machine Learning"]},{"code":"152602","names":["Cryptography"]},{"code":"152603","names":["Web application Security"]},{"code":"152604","names":["AI and Ethics"]},{"code":"152608","names":["Distributed Database"]},{"code":"152616","names":["Pattern Recognition"]},{"code":"153601","names":["Big Data & Tools"]},{"code":"153602","names":["Data Visualization"]},{"code":"153603","names":["Image and Video Processing"]},{"code":"153604","names":["AI and Ethics"]},{"code":"153607","names":["Compiler Design"]},{"code":"153616","names":["Natural Language Processing"]},{"code":"154601","names":["Block Chain Technology"]},{"code":"154602","names":["Artificial Intelligence & Neural Networks"]},{"code":"154603","names":["Machine Learning"]},{"code":"154605","names":["AI and Ethics"]},{"code":"154609","names":["Introduction to Industry 4.0"]},{"code":"154611","names":["Python Programming"]},{"code":"155601","names":["Machine Learning"]},{"code":"155602","names":["Computer Networks"]},{"code":"155603","names":["Ad hoc & Sensor Networks"]},{"code":"155604","names":["AI and Ethics"]},{"code":"155609","names":["Introduction to Industry 4.0"]},{"code":"155612","names":["Python Programming"]},{"code":"156601","names":["Machine Learning"]},{"code":"156602","names":["Wireless Networks"]},{"code":"156603","names":["Ad hoc & Sensor Networks"]},{"code":"156604","names":["AI and Ethics"]},{"code":"156610","names":["Internet and Intranet Engineering"]},{"code":"156614","names":["IoT and It's Applications"]},{"code":"157601","names":["Automata Theory and Compiler Design"]},{"code":"157602","names":["Ad hoc & Network Sensors"]},{"code":"157603","names":["Python Programming"]},{"code":"157604","names":["Cryptography"]},{"code":"157605","names":["AI and Ethics"]},{"code":"157610","names":["Network Security"]},{"code":"157615","names":["E-Commerce and ERP"]}],"7":[{"code":"100708","names":["Biology for Engineers"]},{"code":"100713","names":["Soft Skills and Interpersonal Communication"]},{"code":"100715","names":["Cyber Law and Ethics"]},{"code":"100725","names":["3D Printing and Design"]},{"code":"100726","names":["Digital Image Processing"]},{"code":"100727","names":["Microprocessor"]},{"code":"100728","names":["Soft Skills and Interpersonal Communication"]},{"code":"100730","names":["Intellectual Property Rights"]},{"code":"100734","names":["Sales and Marketing"]},{"code":"100739","names":["Robotics and Robot Application"]},{"code":"100743","names":["Principles of Management"]},{"code":"105701","names":["Data Science"]},{"code":"105705","names":["Internet of Things"]},{"code":"105707","names":["E-Commerce and ERP"]},{"code":"105710","names":["History of Science and Technology in India"]},{"code":"105713","names":["Cyber Security"]},{"code":"105714","names":["Virtual Reality"]},{"code":"105715","names":["3D Printing and Design"]},{"code":"105716","names":["Simulation and Modelling"]},{"code":"105718","names":["Human Computer Interaction"]},{"code":"151701","names":["Natural Language Processing"]},{"code":"151702","names":["Soft Computing"]},{"code":"151703","names":["Internet of Things"]},{"code":"152701","names":["Deep Learning"]},{"code":"152704","names":["Advance Data Structure"]},{"code":"152705","names":["Vulnerability Assessment and Penetration Testing"]},{"code":"153701","names":["Data Analytics Using R Programming"]},{"code":"153702","names":["Internet of Things"]},{"code":"154701","names":["Embedded Systems"]},{"code":"154707","names":["Privacy and Security in IoT"]},{"code":"155701","names":["Deep Learning"]},{"code":"155703","names":["Application of IoT in Robotics"]},{"code":"155706","names":["Sensors and Actuator Devices for IoT"]},{"code":"156702","names":["Social Network Mining"]},{"code":"157701","names":["Natural Language Processing"]},{"code":"157702","names":["Big Data Analytics"]},{"code":"157704","names":["Internet of Things"]}],"8":[{"code":"100809","names":["VLSI System Design"]},{"code":"100811","names":["Introduction to Communication Systems"]},{"code":"100813","names":["Big Data Analytics"]},{"code":"100815","names":["Digital Image Processing"]},{"code":"100816","names":["Bitcoin and Crypto Currencies"]},{"code":"100817","names":["Cloud Computing"]},{"code":"100821","names":["Control Systems"]},{"code":"105801","names":["Data Mining"]},{"code":"105804","names":["Genetic Algorithm"]},{"code":"105811","names":["Real Time Systems"]},{"code":"105812","names":["Block Chain"]},{"code":"105814","names":["Information Retrieval"]},{"code":"105816","names":["Embedded Systems"]},{"code":"105818","names":["High Performance Computing"]},{"code":"105819","names":["Ad-hoc and Sensor Networks"]}]},"Electrical & Electronics Engineering":{"1":[{"code":"100101","names":["Communication Skills (26)"]},{"code":"100102","names":["Engineering Mathematics-I (24+26)"]},{"code":"100103","names":["CHEMISTRY (OLD)"]},{"code":"100104","names":["PROGRAMMING FOR PROBLEM SOLVING (OLD)","Engineering Physics (26)"]},{"code":"100105","names":["WORKSHOP MANUFACTURING PRACTICES (OLD)","Introduction to AI (26)"]},{"code":"100106","names":["ENGLISH (OLD)","Basic Electrical Engineering (24+26)"]},{"code":"100110","names":["Engineering Physics (24)"]},{"code":"100111","names":["Programming for Problem Solving (24)"]},{"code":"100112","names":["Workshop Practices (24)"]},{"code":"103102","names":["MATHEMATICS-I (CALCULUS AND DIFFERENTIAL EQUATIONS) (OLD)"]}],"2":[{"code":"100201","names":["BASIC ELECTRICAL ENGINEERING (OLD)"]},{"code":"100202","names":["ENGINEERING GRAPHICS & DESIGN (OLD)","Engineering Mathematics-II"]},{"code":"100209","names":["Basic Electronics"]},{"code":"100215","names":["Engineering Chemistry"]},{"code":"100216","names":["Communicative English"]},{"code":"100217","names":["Engineering Graphics & Design"]},{"code":"103201","names":["PHYSICS (WAVE AND OPTICS AND INTRODUCTION TO QUANTUM MECHANICS) (OLD)"]},{"code":"103202","names":["MATHEMATICS-II (LINEAR ALGEBRA, TRANSFORM CALCULUS AND NUMERICAL METHODS) (OLD)"]}],"3":[{"code":"100305","names":["DIGITAL ELECTRONICS (OLD)"]},{"code":"100306","names":["ELECTRICAL CIRCUIT ANALYSIS (OLD)"]},{"code":"100307","names":["ELECTRICAL MACHINES - I (OLD)"]},{"code":"100308","names":["ELECTROMAGNETIC FIELDS (OLD)"]},{"code":"100310","names":["ENGINEERING MECHANICS (OLD)"]},{"code":"100311","names":["MATHEMATICS-III (DIFFERENTIAL CALCULUS) (OLD)"]},{"code":"100313","names":["OBJECT ORIENTED PROGRAMMING USING C++ (OLD)"]},{"code":"100314","names":["TECHNICAL WRITING (OLD)"]},{"code":"110301","names":["Electrical Circuit Analysis"]},{"code":"110302","names":["Digital Electronics"]},{"code":"110303","names":["Engineering Mathematics-III (PDE, Prob/stat)"]},{"code":"110304","names":["Electromagnetic Field Theory"]},{"code":"110305","names":["Signals and Systems"]},{"code":"110306","names":["Universal Human Values"]},{"code":"110307","names":["Indian Knowledge System"]}],"4":[{"code":"100401","names":["Biology for Engineers (OLD)"]},{"code":"110401","names":["Analog Electronics (OLD)"]},{"code":"110402","names":["Electrical Machines - II (OLD)"]},{"code":"110404","names":["Mathematics-III (Probability and Statistics) (OLD)"]},{"code":"110405","names":["Microprocessors (OLD)"]},{"code":"110406","names":["Signals and Systems (OLD)"]},{"code":"110407","names":["Engineering Economics & Accountancy (OLD)"]},{"code":"110408","names":["Organizational Behavior & Industrial Psychology (OLD)"]},{"code":"110409","names":["Principle Of Management, Entrepreneurship & IPR (OLD)"]}],"5":[{"code":"100502","names":["Control Systems"]},{"code":"100506","names":["Power Electronics"]},{"code":"100507","names":["Power Systems- (Apparatus and Modelling)"]},{"code":"110501","names":["Analog & Digital Communication System"]}],"6":[{"code":"100606","names":["Digital Signal Processing"]},{"code":"100607","names":["Introduction to VLSI Design"]},{"code":"100608","names":["Professional Skill Development"]},{"code":"100611","names":["Computer Architecture"]},{"code":"100612","names":["Digital Control Systems"]},{"code":"100613","names":["Electrical Drives"]},{"code":"100614","names":["Digital Image & Video Processing"]},{"code":"110601","names":["Measurements and Instrumentation"]},{"code":"110602","names":["Advanced Electric Drives"]},{"code":"110608","names":["Electrical Energy Conservation and Auditing"]},{"code":"110609","names":["Electrical Machine Design"]}],"7":[{"code":"100704","names":["Electromagnetic Waves"]},{"code":"100716","names":["Data Structure & Algorithms"]},{"code":"110703","names":["High Voltage Engineering"]},{"code":"110704","names":["Industrial Electrical Systems"]},{"code":"110706","names":["Power System II"]},{"code":"110707","names":["Digital Control [5]"]},{"code":"110709","names":["Electrical and Hybrid Vehicles"]},{"code":"110715","names":["Computer Networks"]},{"code":"110719","names":["Internet of Things"]},{"code":"110723","names":["Basic of Robotics [5]"]},{"code":"110725","names":["Cloud Computing"]},{"code":"110727","names":["Object Oriented Programming using C++"]},{"code":"110728","names":["Electrical Safety"]},{"code":"110729","names":["Artificial Neural Network"]}],"8":[{"code":"100804","names":["Power Quality and FACTS"]},{"code":"100806","names":["Microwave Theory and Techniques"]},{"code":"100812","names":["Cyber security"]},{"code":"100819","names":["Satellite Communication"]},{"code":"110801","names":["Fiber Optic Communications"]},{"code":"110803","names":["Power System Protection"]},{"code":"110804","names":["Smart Grid"]},{"code":"110806","names":["Wind and Solar Energy Systems"]},{"code":"110807","names":["Power Plant Engineering"]},{"code":"110810","names":["Electrical Materials"]},{"code":"110819","names":["E-Commerce and ERP"]}]},"Civil Engineering":{"1":[{"code":"100101","names":["BASIC ELECTRICAL ENGINEERING (OLD)","Engineering Chemistry (24)","Communication Skills (26)"]},{"code":"100102","names":["ENGINEERING GRAPHICS & DESIGN (OLD)","Engineering Mathematics-I (24+26)"]},{"code":"100103","names":["Communicative English (24)","Engineering Chemistry (26)"]},{"code":"100104","names":["Engineering Graphics and Design (24)","Engineering Physics (26)"]},{"code":"100105","names":["Engineering Mechanics (24)","Introduction to AI (26)"]},{"code":"100107","names":["Engineering Graphics and Design (26)"]},{"code":"100108","names":["Computer Fundamentals & Emerging Technologies (26)"]},{"code":"100109","names":["Universal Human Values (26)"]},{"code":"100110","names":["Essence of Indian Constitution (26)"]},{"code":"100111","names":["Basics of Electrical & Electronics Engineering (26)"]},{"code":"101101","names":["PHYSICS(MECHANICS) (OLD)"]},{"code":"101102","names":["MATHEMATICS-I (CALCULUS, MULTIVARIABLE CALCULUS AND LINEAR ALGEBRA) (OLD)"]}],"2":[{"code":"100201","names":["Engineering Physics"]},{"code":"100202","names":["Engineering Mathematics-II"]},{"code":"100203","names":["CHEMISTRY (OLD)","Programming for Problem Solving"]},{"code":"100204","names":["PROGRAMMING FOR PROBLEM SOLVING (OLD)"]},{"code":"100205","names":["WORKSHOP MANUFACTURING PRACTICES (OLD)"]},{"code":"100206","names":["ENGLISH (OLD)"]},{"code":"100211","names":["Workshop"]},{"code":"100212","names":["Basic Electrical Engineering"]},{"code":"101202","names":["MATHEMATICS-II (DIFFERENTIAL EQUATIONS) (OLD)"]}],"3":[{"code":"100301","names":["BIOLOGY FOR ENGINEERS (OLD)"]},{"code":"100312","names":["MATHEMATICS-III (PDE, PROBABILILTY AND STATISTICS) (OLD)"]},{"code":"101301","names":["Solid Mechanics"]},{"code":"101302","names":["BASIC ELECTRONICS (OLD)","Engineering Mathematics-III (PDE, Prob/Stat)"]},{"code":"101303","names":["COMPUTER AIDED CIVIL ENGINEERING DRAWING (OLD)","Universal Human Values"]},{"code":"101304","names":["ENGINEERING MECHANICS (OLD)","Surveying and Geomatics"]},{"code":"101305","names":["HUMANITIES-I(EFFECTIVE TECHNICAL COMMUNICATION) (OLD)","Fluid Mechanics"]},{"code":"101306","names":["INTRODUCTION TO CIVIL ENGINEERING (OLD)","Materials, Testing & Evaluation"]},{"code":"101307","names":["Indian Knowledge System"]},{"code":"101308","names":["SURVEYING & GEOMATICS (OLD)"]},{"code":"119301","names":["Biology for Engineers (OLD)","Solid Mechanics"]},{"code":"119302","names":["Basic Electronics (OLD)","Engineering Mathematics-III (PDE, Prob/Stat)"]},{"code":"119303","names":["Computer Aided Civil Engineering Drawing (OLD)","Geo Informatics"]},{"code":"119304","names":["Engineering Mechanics (OLD)","Fluid Mechanics"]},{"code":"119305","names":["Humanities -I (Effective Technical Communication) (OLD)","Machine Learning"]},{"code":"119306","names":["Solid Mechanics (OLD)","Materials, Testing & Evaluation"]},{"code":"119307","names":["Mathematics -III (PDE, Probability and Statistics) (OLD)","Universal Human Values"]},{"code":"119308","names":["Surveying & Geomatics (OLD)"]}],"4":[{"code":"101401","names":["Civil Engineering - Societal & Global Impact (OLD)"]},{"code":"101402","names":["Disaster Preparedness & Planning (OLD)"]},{"code":"101403","names":["Engineering Geology (OLD)"]},{"code":"101404","names":["Introduction to Fluid Mechanics (OLD)"]},{"code":"101405","names":["Introduction to Solid Mechanics (OLD)"]},{"code":"101406","names":["Materials, Testing & Evaluation (OLD)"]},{"code":"101407","names":["Mechanical Engineering (OLD)"]},{"code":"101408","names":["Structural Analysis (OLD)"]},{"code":"119401","names":["Mechanical Engineering (OLD)"]},{"code":"119402","names":["Engineering Geology (OLD)"]},{"code":"119403","names":["Disaster Preparedness & Planning (OLD)"]},{"code":"119404","names":["Introduction to Fluid Mechanics (OLD)"]},{"code":"119405","names":["Structural Analysis (OLD)"]},{"code":"119406","names":["Materials, Testing & Evaluation (OLD)"]}],"5":[{"code":"101501","names":["Analysis and Design of Concrete Structure"]},{"code":"101502","names":["Environmental Engineering -I"]},{"code":"101503","names":["Geotechnical Engineering -1"]},{"code":"101504","names":["Hydraulic Engineering"]},{"code":"101505","names":["Hydrology & Water Resources Engineering"]},{"code":"101506","names":["Mechanics of Materials"]},{"code":"101507","names":["Transportation Engineering"]},{"code":"119501","names":["Machine Learning"]},{"code":"119502","names":["Hydraulic Engineering"]},{"code":"119503","names":["Analysis and design Of Concrete structure"]},{"code":"119504","names":["Geotechnical Engineering -1"]},{"code":"119505","names":["Hydrology and Water Resources Engineering"]},{"code":"119506","names":["Environmental Engineering-I"]},{"code":"119507","names":["Transportation Engineering"]}],"6":[{"code":"101602","names":["Construction Engineering & Management"]},{"code":"101603","names":["Design of Steel Structure"]},{"code":"101604","names":["Engineering Economics, Estimation & Costing"]},{"code":"101605","names":["Environmental Engineering-II"]},{"code":"101606","names":["Geotechnical Engineering -II"]},{"code":"101607","names":["Energy Science & Engineering"]},{"code":"101608","names":["Highway Construction and management"]},{"code":"101612","names":["Design of hydraulic structures/Irrigation Engineering"]},{"code":"101613","names":["Water Quality Engineering"]},{"code":"101617","names":["Concrete Materials"]},{"code":"101619","names":["Soil Mechanics-I"]},{"code":"101623","names":["Airport Planning and Design"]},{"code":"119601","names":["Database Management System"]},{"code":"119602","names":["Design of Steel Structure"]},{"code":"119603","names":["Engineering Economics, Estimation & Costing"]},{"code":"119604","names":["Artificial Intelligence"]},{"code":"119605","names":["Environmental Engineering-II"]},{"code":"119606","names":["Geotechnical Engineering -II"]},{"code":"119611","names":["Design of Hydraulic Structures/Irrigation Engineering"]}],"7":[{"code":"100713","names":["Soft Skills and Interpersonal Communication"]},{"code":"100714","names":["Human Resource Development and Organizational Behavior"]},{"code":"100715","names":["Cyber Law and Ethics"]},{"code":"100728","names":["Soft Skills and Interpersonal Communication"]},{"code":"101701","names":["Professional Practice, Law & Ethics"]},{"code":"101703","names":["Pavement Design"]},{"code":"101704","names":["Building Construction Practice"]},{"code":"101705","names":["Transport of Water and Wastewater"]},{"code":"101707","names":["Surface Hydrology"]},{"code":"101710","names":["Concrete Technology"]},{"code":"101712","names":["Soil Mechanics-II"]},{"code":"101713","names":["Environmental Impact Assessment and Life Cycle Analyses"]},{"code":"101714","names":["Sustainable Engineering & Technology"]},{"code":"101715","names":["Groundwater"]},{"code":"101718","names":["Geographic Information Systems and Science"]},{"code":"101720","names":["Public Transportation Systems"]},{"code":"101721","names":["Traffic Engineering and Management"]},{"code":"101722","names":["Foundation Engineering"]},{"code":"101729","names":["Environmental Fluid Mechanics"]},{"code":"101730","names":["Open Channel flow"]},{"code":"101731","names":["Environmental Laws and Policy"]},{"code":"101732","names":["Construction Project Planning & Systems"]},{"code":"101733","names":["Rock Mechanics"]},{"code":"101739","names":["ICT for Development"]},{"code":"119701","names":["Professional Practice, Law & Ethics"]},{"code":"119702","names":["Computer Application in Construction Engineering and Management"]},{"code":"119703","names":["Internet of Things"]},{"code":"119710","names":["Construction Equipment & Automation"]},{"code":"119716","names":["RS and GIS Application in Civil Engineering"]}],"8":[{"code":"101801","names":["Urban Transportation Planning"]},{"code":"101802","names":["Geometric Design of Highways"]},{"code":"101803","names":["Contracts Management"]},{"code":"101805","names":["River Engineering"]},{"code":"101806","names":["Water Resources Field Methods"]},{"code":"101808","names":["Prestressed Concrete"]},{"code":"101813","names":["Pavement Materials"]},{"code":"101814","names":["Construction Cost Analysis"]},{"code":"101818","names":["Railway Engineering"]},{"code":"101825","names":["Rural Water Supply and Onsite Sanitation Systems"]},{"code":"101827","names":["Construction Engineering Materials."]},{"code":"101828","names":["Solid and Hazardous Waste Management"]},{"code":"101838","names":["Economic Policies in India"]},{"code":"101839","names":["Metro Systems and Engineering"]}]},"Electrical Engineering":{"1":[{"code":"100101","names":["Communication Skills (26)"]},{"code":"100102","names":["Engineering Mathematics-I (24+26)"]},{"code":"100103","names":["CHEMISTRY (OLD)"]},{"code":"100104","names":["PROGRAMMING FOR PROBLEM SOLVING (OLD)","Engineering Physics (26)"]},{"code":"100105","names":["WORKSHOP MANUFACTURING PRACTICES (OLD)","Introduction to AI (26)"]},{"code":"100106","names":["ENGLISH (OLD)","Basic Electrical Engineering (24+26)"]},{"code":"100110","names":["Engineering Physics (24)"]},{"code":"100111","names":["Programming for Problem Solving (24)"]},{"code":"100112","names":["Workshop Practices (24)"]},{"code":"103102","names":["MATHEMATICS-I (CALCULUS AND DIFFERENTIAL EQUATIONS) (OLD)"]}],"2":[{"code":"100201","names":["BASIC ELECTRICAL ENGINEERING (OLD)"]},{"code":"100202","names":["ENGINEERING GRAPHICS & DESIGN (OLD)","Engineering Mathematics-II"]},{"code":"100209","names":["Basic Electronics"]},{"code":"100215","names":["Engineering Chemistry"]},{"code":"100216","names":["Communicative English"]},{"code":"100217","names":["Engineering Graphics & Design"]},{"code":"103201","names":["PHYSICS (WAVE AND OPTICS AND INTRODUCTION TO QUANTUM MECHANICS) (OLD)"]},{"code":"103202","names":["MATHEMATICS-II (LINEAR ALGEBRA, TRANSFORM CALCULUS AND NUMERICAL METHODS) (OLD)"]}],"3":[{"code":"100302","names":["ANALOG ELECTRONIC CIRCUITS (OLD)"]},{"code":"100306","names":["ELECTRICAL CIRCUIT ANALYSIS (OLD)"]},{"code":"100307","names":["ELECTRICAL MACHINES - I (OLD)"]},{"code":"100308","names":["ELECTROMAGNETIC FIELDS (OLD)"]},{"code":"100310","names":["ENGINEERING MECHANICS (OLD)"]},{"code":"103301","names":["Electrical Circuit Analysis"]},{"code":"103302","names":["Analog Electronics"]},{"code":"103303","names":["Electrical Machines-I"]},{"code":"103304","names":["Engineering Mathematics-III (PDE, Prob/stat)"]},{"code":"103305","names":["Engineering Mechanics"]},{"code":"103306","names":["Universal Human Values"]}],"4":[{"code":"100401","names":["Biology for Engineers (OLD)"]},{"code":"100403","names":["Digital Electronics (OLD)"]},{"code":"103401","names":["Electrical and Electronics Measurement (OLD)"]},{"code":"103402","names":["Electrical Machines - II (OLD)"]},{"code":"103403","names":["Mathematics-III (Probability and Statistics) (OLD)"]},{"code":"103404","names":["Signals and Systems (OLD)"]}],"5":[{"code":"100502","names":["Control Systems"]},{"code":"100504","names":["Microprocessor"]},{"code":"100506","names":["Power Electronics"]},{"code":"100507","names":["Power Systems-I (Apparatus and Modelling)"]},{"code":"103502","names":["Wind and Solar Energy Systems"]},{"code":"104503","names":["Linear Control Systems"]}],"6":[{"code":"100606","names":["Digital Signal Processing"]},{"code":"100607","names":["Introduction to VLSI Design"]},{"code":"100608","names":["Professional Skill Development"]},{"code":"100611","names":["Computer Architecture"]},{"code":"100613","names":["Electrical Drives"]},{"code":"103601","names":["Power Systems - II (Operation and Control)"]},{"code":"103605","names":["High Voltage Engineering"]},{"code":"103606","names":["Industrial Electrical Systems"]}],"7":[{"code":"100704","names":["Electromagnetic Waves"]},{"code":"100716","names":["Data Structure & Algorithms"]},{"code":"103701","names":["Power System Protection"]},{"code":"103703","names":["Digital Signal Processing"]},{"code":"103704","names":["Computational Electromagnetics"]},{"code":"103708","names":["Electronic Devices"]},{"code":"103712","names":["Power Plant Engineering"]},{"code":"103715","names":["Electrical Materials"]}],"8":[{"code":"100802","names":["Control Systems Design"]},{"code":"100803","names":["HVDC Transmission Systems"]},{"code":"100804","names":["Power Quality and FACTS"]},{"code":"100814","names":["Internet of Things"]},{"code":"100815","names":["Digital Image Processing"]},{"code":"103801","names":["Electrical and Hybrid Vehicles"]},{"code":"103804","names":["Computer Networks"]},{"code":"103807","names":["Strength of Materials"]}]},"Others":{"1":[{"code":"100101","names":["BASIC ELECTRICAL ENGINEERING (OLD)","Communication Skills (26)","Engineering Chemistry (24)"]},{"code":"100102","names":["ENGINEERING GRAPHICS & DESIGN (OLD)","Engineering Mathematics-I (24+26)"]},{"code":"100103","names":["Engineering Chemistry (26)","Communicative English (24)","CHEMISTRY (OLD)"]},{"code":"100104","names":["Engineering Physics (26)","Engineering Graphics and Design (24)","PROGRAMMING FOR PROBLEM SOLVING (OLD)"]},{"code":"100105","names":["Introduction to AI (26)","WORKSHOP MANUFACTURING PRACTICES (OLD)"]},{"code":"100106","names":["ENGLISH (OLD)","Basic Electrical Engineering (24+26)"]},{"code":"100107","names":["Engineering Graphics and Design (26)","Python Programming (24)"]},{"code":"100108","names":["Computer Fundamentals & Emerging Technologies (26)","Introduction to Web Design (24)"]},{"code":"100109","names":["Universal Human Values (26)"]},{"code":"100110","names":["Engineering Physics (24)","Essence of Indian Constitution (26)"]},{"code":"100111","names":["Programming for Problem Solving (24)","Basics of Electrical & Electronics Engineering (26)"]},{"code":"100112","names":["Workshop Practices (24)"]},{"code":"100113","names":["IT Workshop (24)"]},{"code":"100114","names":["Basic Electronics Engineering (24)"]},{"code":"101101","names":["PHYSICS(MECHANICS) (OLD)"]},{"code":"101102","names":["MATHEMATICS-I (CALCULUS, MULTIVARIABLE CALCULUS AND LINEAR ALGEBRA) (OLD)"]},{"code":"102101","names":["PHYSICS (ELECTROMAGNETISM) (OLD)"]},{"code":"102102","names":["MATHEMATICS-I (CALCULUS AND LINEAR ALGEBRA) (OLD)"]},{"code":"103102","names":["MATHEMATICS-I (CALCULUS AND DIFFERENTIAL EQUATIONS) (OLD)"]},{"code":"105101","names":["PHYSICS(SEMICONDUCTOR PHYSICS AND INTRODUCTION TO QUANTUM MECHANICS) (OLD)"]},{"code":"105102","names":["MATHEMATICS-I (CALCULUS AND LINEAR ALGEBRA) (OLD)"]},{"code":"201101","names":["Basic Design (24)","Architectural Design -I (OLD)"]},{"code":"201102","names":["Communication Skill (24)","Comunication Skills (OLD)"]},{"code":"201103","names":["Principle of Architecture (24)","Architectural Structures -I (OLD)"]},{"code":"201104","names":["Art & Graphics - I (24)","Arts & Graphics-I (OLD)"]},{"code":"201105","names":["Mathematics-1 (24)","Maths -I (OLD)"]},{"code":"201106","names":["Information and communication Technology (24)"]}],"2":[{"code":"100201","names":["BASIC ELECTRICAL ENGINEERING (OLD)","Engineering Physics"]},{"code":"100202","names":["Engineering Mathematics-II","ENGINEERING GRAPHICS & DESIGN (OLD)"]},{"code":"100203","names":["CHEMISTRY (OLD)","Programming for Problem Solving"]},{"code":"100204","names":["PROGRAMMING FOR PROBLEM SOLVING (OLD)","Elements of Mechanical Engineering"]},{"code":"100205","names":["WORKSHOP MANUFACTURING PRACTICES (OLD)","Introduction to Leather and Chemical Technology"]},{"code":"100206","names":["ENGLISH (OLD)","Workshop Practices"]},{"code":"100207","names":["Food Chemistry"]},{"code":"100208","names":["IT Workshop"]},{"code":"100209","names":["Basic Electronics"]},{"code":"100213","names":["Introduction to Chemical Engineering"]},{"code":"100215","names":["Engineering Chemistry"]},{"code":"100216","names":["Communicative English"]},{"code":"100217","names":["Engineering Graphics & Design"]},{"code":"100218","names":["Python Programming"]},{"code":"100219","names":["Introduction to Web Design"]},{"code":"101202","names":["MATHEMATICS-II (DIFFERENTIAL EQUATIONS) (OLD)"]},{"code":"102202","names":["MATHEMATICS-II (ODE & COMPLEX VARIABLES) (OLD)"]},{"code":"103201","names":["PHYSICS (WAVE AND OPTICS AND INTRODUCTION TO QUANTUM MECHANICS) (OLD)"]},{"code":"103202","names":["MATHEMATICS-II (LINEAR ALGEBRA, TRANSFORM CALCULUS AND NUMERICAL METHODS) (OLD)"]},{"code":"105201","names":["PHYSICS (SEMICONDUCTOR PHYSICS) (OLD)"]},{"code":"105202","names":["MATHEMATICS-II (PROBABILITY AND STATISTICS) (OLD)"]},{"code":"201201","names":["Architectural Design-I","Basic Design (OLD)"]},{"code":"201202","names":["Building Construction-1/Principle of Architecture (OLD)"]},{"code":"201203","names":["Art & Graphics- II","Information & Communication Technology (OLD)"]},{"code":"201204","names":["Architectural Structure-I/Building Construction I (OLD)"]},{"code":"201205","names":["Culture and Architecture","Art & Graphics II (OLD)"]},{"code":"201206","names":["Culture and Architecture (OLD)"]}],"3":[{"code":"100303","names":["BASIC ELECTRONICS ENGINEERING (OLD)"]},{"code":"100304","names":["DATA STRUCTURE & ALGORITHMS (OLD)"]},{"code":"100305","names":["DIGITAL ELECTRONICS (OLD)"]},{"code":"100309","names":["ENGINEERING MECHANICS (OLD)"]},{"code":"100311","names":["MATHEMATICS-III (DIFFERENTIAL CALCULUS) (OLD)"]},{"code":"100312","names":["MATHEMATICS-III (PDE, PROBABILILTY AND STATISTICS) (OLD)"]},{"code":"100313","names":["OBJECT ORIENTED PROGRAMMING USING C++ (OLD)"]},{"code":"100314","names":["TECHNICAL WRITING (OLD)"]},{"code":"106301","names":["DISCRETE MATHEMATICS (OLD)","Digital Electronics"]},{"code":"106302","names":["Data Structure and Algorithm"]},{"code":"106303","names":["Object Oriented Programming using C++"]},{"code":"106304","names":["Discrete Mathematics and Graph Theory"]},{"code":"106305","names":["Operating System"]},{"code":"106306","names":["Universal Human Values"]},{"code":"107301","names":["PHYSICS(WAVES AND OPTICS) (OLD)"]},{"code":"107302","names":["INTRODUCTION TO LEATHER TECHNOLOGY (OLD)"]},{"code":"111301","names":["Electronic Devices and Circuit Theory"]},{"code":"111302","names":["Electrical and Electronic Material"]},{"code":"111303","names":["Network Theory"]},{"code":"111304","names":["Signals & Systems"]},{"code":"111305","names":["Engineering Mathematics-III (PDE, Prob/Stat)"]},{"code":"111306","names":["Universal Human Values"]},{"code":"112301","names":["Occupation Health & Hygiene (OLD)","Engineering Mathematics -III (PDE, Prob/Stat)"]},{"code":"112302","names":["Safety Engineering & Fire Technology (OLD)","Occupation Health & Hygiene"]},{"code":"112303","names":["Building Drawing & Design Aspect (OLD)","Safety Engineering & Fire Technology"]},{"code":"112304","names":["Strength of Materials (OLD)","Building Drawing and Design Aspect"]},{"code":"112305","names":["Python programming (OLD)","Strength of Materials"]},{"code":"112306","names":["Mathematics-III (OLD)","Universal Human Values"]},{"code":"113301","names":["Engineering Materials (OLD)","Engineering Mathematics -III (PDE, Prob/Stat)"]},{"code":"113302","names":["Basics of Mining Engineering (OLD)","Engineering Materials"]},{"code":"113303","names":["Mining Environment-I (OLD)","Basics of Mining Engineering"]},{"code":"113304","names":["Mining Geology (OLD)","Mining Environment-I"]},{"code":"113305","names":["Python programming (OLD)","Mining Geology"]},{"code":"113306","names":["Maths - III (OLD)","Python Programming"]},{"code":"113307","names":["Universal Human Values"]},{"code":"114301","names":["Introduction to Chemical Engineering (OLD)","Engineering Mathematics -III (PDE, Prob/Stat)"]},{"code":"114302","names":["Process Calculation (OLD)","Chemical Engineering Materials"]},{"code":"114303","names":["Solid Fluid Operations (OLD)","Process Calculation"]},{"code":"114304","names":["Physical & Organic Chemistry (OLD)","Solid Fluid Operations"]},{"code":"114305","names":["Python programming (OLD)","Physics & Organic Chemistry"]},{"code":"114306","names":["Maths - III (OLD)","Industrial Fluid Flow Operation"]},{"code":"114307","names":["Universal Human Values"]},{"code":"115301","names":["Principles of Food Preservation (OLD)","Engineering Mathematics -III (PDE, Prob/Stat)"]},{"code":"115302","names":["Food Processing Operations (OLD)","Principles of Food Preservation"]},{"code":"115303","names":["Food Microbiology (OLD)","Food Processing Operations"]},{"code":"115304","names":["Food Chemistry (OLD)","Food Microbiology"]},{"code":"115305","names":["Maths - III (OLD)","Python Programming"]},{"code":"115306","names":["Python programming (OLD)","Universal Human Values"]},{"code":"116301","names":["Elements of Aeronautical Engineering (OLD)","Engineering Mathematics -III (PDE, Prob/Stat)"]},{"code":"116302","names":["Mechanics of Solids (OLD)","Elements of Aeronautical Engineering"]},{"code":"116303","names":["Aero Engineering Thermdynamics (OLD)","Mechanics of Solids"]},{"code":"116304","names":["Python Programming (OLD)","Aero Engineering Thermodynamics"]},{"code":"116305","names":["Maths - III (OLD)","Universal Human Values"]},{"code":"117301","names":["Human Anatomy and Physiology (OLD)","Engineering Mathematics -III (PDE, Prob/Stat)"]},{"code":"117302","names":["Analog and Digital Circuit Design (OLD)","Human Anatomy and Physiology"]},{"code":"117303","names":["Biomaterials Science and Engineering (OLD)","Analog and Digital Circuit Design"]},{"code":"117304","names":["Fundamentals of Robotics (OLD)","Fundamentals of Robotics"]},{"code":"117305","names":["Python programming (OLD)","Python Programming"]},{"code":"117306","names":["Maths - III (OLD)","Universal Human Values"]},{"code":"117307","names":["Indian Knowledge System"]},{"code":"118301","names":["Drawing and Sketching (OLD)","Engineering Mathematics -III (PDE, Prob/Stat)"]},{"code":"118302","names":["Fundamentals of Multimedia (OLD)","Drawing and Sketching"]},{"code":"118303","names":["Basics of Communication (OLD)","Basics of Communication"]},{"code":"118304","names":["Illustration and Image processing (OLD)","Fundamentals of Multimedia"]},{"code":"118305","names":["Python programming (OLD)","Universal Human Values"]},{"code":"161301","names":["Engineering Mechanics (OLD)","Engineering Mechanics"]},{"code":"161302","names":["Fluid Mechanics and Machinery (OLD)","Fluid Mechanics and Machinery"]},{"code":"161303","names":["Basic Mechatronics (OLD)","Engineering Mathematics-III (PDE, Prob/Stat)"]},{"code":"161304","names":["Strength of Materials (OLD)","Basic Mechatronics"]},{"code":"161305","names":["Python programming (OLD)","Strength of Materials"]},{"code":"161306","names":["Maths III (OLD)","Universal Human Values"]},{"code":"162301","names":["Biology for Engineers (OLD)","Biology for Engineers"]},{"code":"162302","names":["Basic Electronics Engineering (OLD)","Basic Electronics Engineering"]},{"code":"162303","names":["Engineering Mechanics (OLD)","Engineering Mechanics"]},{"code":"162304","names":["Thermodynamics (OLD)","Thermodynamics"]},{"code":"162305","names":["Mathematics-III (PDF, Probability & Statistics) (OLD)","Engineering Mathematics III (PDE, Probability & Statistics)"]},{"code":"162306","names":["Universal Human Values"]},{"code":"165301","names":["Engineering Mathematics -III (PDE, Prob/Stat)"]},{"code":"165302","names":["Material and Energy Balance"]},{"code":"165303","names":["Fluid Mechanics and mechanical operation"]},{"code":"165304","names":["Biochemistry of Protein"]},{"code":"165305","names":["Theory & practices of preservation and pre-tanning process"]},{"code":"165306","names":["Universal Human Values"]},{"code":"171301","names":["Engineering Mathematics -III (PDE, Prob/Stat)"]},{"code":"171302","names":["Environmental Pollution Control"]},{"code":"171303","names":["Thermodynamics"]},{"code":"171304","names":["Fluid Mechanics"]},{"code":"171305","names":["Transport Phenomena"]},{"code":"171306","names":["Introduction to Petrochemical"]},{"code":"171307","names":["Universal Human Values"]},{"code":"187301","names":["Engineering Mathematics -III (PDE, Prob/Stat)"]},{"code":"187302","names":["Organic Chemistry"]},{"code":"187303","names":["Thermodynamics"]},{"code":"187304","names":["Fluid Mechanics"]},{"code":"187305","names":["Plastic Material"]},{"code":"187306","names":["Universal Human Values"]},{"code":"201301","names":["Architectural Design-II (OLD)","Architectural Design-II"]},{"code":"201302","names":["Building Construction - II (OLD)","Building Construction - II"]},{"code":"201303","names":["Architectural Structures-II (OLD)","Architectural Structures-II"]},{"code":"201304","names":["History of Architecture-I (OLD)","History of Architecture-I"]},{"code":"201305","names":["Climate Responsive Architecture (OLD)","Climate Responsive Architecture"]},{"code":"201306","names":["Theory of Design (OLD)","Theory of Design"]}],"4":[{"code":"100406","names":["Formal Language & Automata Theory (OLD)"]},{"code":"100407","names":["Human Resource Development and Organizational Behavior (OLD)"]},{"code":"104403","names":["Digital Circuits (OLD)"]},{"code":"106401","names":["Computer Organization & Architecture (OLD)"]},{"code":"106402","names":["Database management System (OLD)"]},{"code":"106403","names":["Machine Learning (OLD)"]},{"code":"107401","names":["Analytical Chemistry of Leather (OLD)"]},{"code":"107402","names":["Biochemistry of protein (OLD)"]},{"code":"107403","names":["Chemical Engineering - I (OLD)"]},{"code":"107404","names":["Principles of Inorganic Tannage (OLD)"]},{"code":"107405","names":["Theory & Practices of preservation and pre tanning processes (OLD)"]},{"code":"111401","names":["Analog Communication (OLD)"]},{"code":"111402","names":["Measurement & Instrumentation (OLD)"]},{"code":"111403","names":["Biology for Engineers (OLD)"]},{"code":"111406","names":["Analog Electronics (OLD)"]},{"code":"112401","names":["Heat and Mass Transfer (OLD)"]},{"code":"112402","names":["Planning and Design of Fire Protection System (OLD)"]},{"code":"112403","names":["Electrical Technology and Safety (OLD)"]},{"code":"112404","names":["Smoke Management and Fire Alarm System (OLD)"]},{"code":"112405","names":["Engineering Fluid Mechanics and Pumping Machinery (OLD)"]},{"code":"113401","names":["Basic Surface Mining (OLD)"]},{"code":"113402","names":["Underground Coal Mining (OLD)"]},{"code":"113403","names":["Mine Ventilation Engineering (OLD)"]},{"code":"113404","names":["Drilling and Blasting (OLD)"]},{"code":"113405","names":["Mining Machinery (OLD)"]},{"code":"114401","names":["Chemical Process Technology (OLD)"]},{"code":"114402","names":["Chemical Engineering Materials (OLD)"]},{"code":"114403","names":["Chemical Engineering Thermodynamics (OLD)"]},{"code":"114404","names":["Industrial Fluid Flow Operations (OLD)"]},{"code":"114405","names":["Process Equipment Design and Drawing (OLD)"]},{"code":"115401","names":["Food Engineering (OLD)"]},{"code":"115402","names":["Human Nutrition (OLD)"]},{"code":"115403","names":["Industrial Microbiology (OLD)"]},{"code":"115404","names":["Technology of Cereal, Pulses and Oil Seeds Products (OLD)"]},{"code":"116401","names":["Fluids Mechanics (OLD)"]},{"code":"116402","names":["Propulsion-I (OLD)"]},{"code":"116403","names":["Aircraft Structures-I (OLD)"]},{"code":"116404","names":["Aircraft Hardware and Materials (OLD)"]},{"code":"117401","names":["Biomedical Transducer and Instrumentaition (OLD)"]},{"code":"117402","names":["Robotics Meechanics, Kinematics and Dynamics (OLD)"]},{"code":"117403","names":["Robotics Sensor and Actuaator (OLD)"]},{"code":"117404","names":["Principles of Communication Engineering (OLD)"]},{"code":"118401","names":["Computer Graphics (OLD)"]},{"code":"118402","names":["2D Animation and Motion Graphics (OLD)"]},{"code":"118403","names":["Design and Anlysis of Algorithm (OLD)"]},{"code":"118404","names":["Operating System (OLD)"]},{"code":"118405","names":["Human resource Development and Organizational Behaviour (OLD)"]}],"5":[{"code":"100504","names":["Microprocessor"]},{"code":"100506","names":["Power Electronics"]},{"code":"100508","names":["Professional Skill Development"]},{"code":"100512","names":["Design Thinking"]},{"code":"100514","names":["Green Energy Technologies"]},{"code":"100518","names":["Renewable Energy Sources"]},{"code":"104503","names":["Linear Control Systems"]},{"code":"104504","names":["Linear Integrated Circuits and Applications"]},{"code":"104505","names":["Microprocessors and Microcontrollers"]},{"code":"106501","names":["Compiler Design"]},{"code":"106502","names":["Design Analysis of Algorithm"]},{"code":"106503","names":["Operating System"]},{"code":"106504","names":["Seminar"]},{"code":"107501","names":["Chemical Engineering - II"]},{"code":"107502","names":["Economics (Humanities)"]},{"code":"107503","names":["Leather Product Technology-I"]},{"code":"107504","names":["Practices of Leather Manufacturing - 1"]},{"code":"107505","names":["Principles of Organic Tannage"]},{"code":"107506","names":["Principles of Post Tanning Operation"]},{"code":"111502","names":["Sensors and Transducers"]},{"code":"112501","names":["Hydraulic Systems for Firefighting Equipment"]},{"code":"112502","names":["Paramedics of Emergencies"]},{"code":"112503","names":["Firefighting Installations in Public Buildings"]},{"code":"113501","names":["Underground Metal Mining"]},{"code":"113502","names":["Mine Economics"]},{"code":"113503","names":["Rock Mechanics"]},{"code":"113507","names":["Strata Control"]},{"code":"114501","names":["Hazard & Risk Analysis"]},{"code":"114502","names":["Industrial Pollution & Control"]},{"code":"114503","names":["Introduction to Analytical Instrument"]},{"code":"115501","names":["Food Additives and Preservatives"]},{"code":"115502","names":["Technology of Fruits and Vegetable Processing and its Preservation"]},{"code":"115503","names":["Milk and Milk Product Processing and Preservation"]},{"code":"116501","names":["Propulsion-II"]},{"code":"116502","names":["Aircraft Structure - II"]},{"code":"116503","names":["Theory of Machines"]},{"code":"117501","names":["Robotics Control System"]},{"code":"117502","names":["Diagnostic and Therapeutic Equipment"]},{"code":"117503","names":["Sensors and Actuators"]},{"code":"118501","names":["3D Modelling"]},{"code":"118502","names":["3D Character Design and Sculpting (Z-Brush)"]},{"code":"118503","names":["3D Texturing"]},{"code":"161501","names":["Fluid Power System"]},{"code":"161502","names":["Sensors and Instrumentation"]},{"code":"161503","names":["Microcontrollers and Embedded Systems"]},{"code":"162501","names":["Dynamics of Machinery"]},{"code":"162502","names":["Mechatronics, Robotics & Control"]},{"code":"162503","names":["Instrumentation & Sensors"]}],"6":[{"code":"100601","names":["Biology for Engineers"]},{"code":"100602","names":["Computer Networks"]},{"code":"100608","names":["Professional Skill Development"]},{"code":"100615","names":["Basic of AI"]},{"code":"100616","names":["Electrical and Hybrid Vehicles"]},{"code":"100619","names":["AR VR Technology"]},{"code":"100622","names":["3D Printing and Design"]},{"code":"106601","names":["Software Engineering"]},{"code":"106603","names":["Data Mining"]},{"code":"106609","names":["Web Technology"]},{"code":"107601","names":["Chemical Engineering -III"]},{"code":"107602","names":["Finance and accounting (Humanities)"]},{"code":"107604","names":["Leather finishing materials and Auxiliaries"]},{"code":"107605","names":["Practices of Leather manufacturing -II"]},{"code":"107606","names":["Principles of material testing"]},{"code":"111601","names":["Industrial Instrumentation"]},{"code":"111602","names":["Analytical Instrumentation"]},{"code":"111603","names":["Computer Networks and Security"]},{"code":"111604","names":["Instrumentation in process industries"]},{"code":"111605","names":["Artificial Intelligence"]},{"code":"112601","names":["Fire Safety in Electrical Installations"]},{"code":"112602","names":["Computer Aided Risk Analysis"]},{"code":"112603","names":["Fire Emergency Communication Systems"]},{"code":"112607","names":["Plant Fire Safety and Industrial Safety"]},{"code":"113601","names":["Advanced Mine Survey"]},{"code":"113602","names":["Blasting Technology"]},{"code":"113603","names":["Mining Legislation and Safety- 1"]},{"code":"113606","names":["Advanced Coal Mine Planning"]},{"code":"114601","names":["Heat Transfer Operation"]},{"code":"114602","names":["Chemical Reaction Engineering"]},{"code":"114603","names":["Simulation Software for Chemical Engineering"]},{"code":"114607","names":["Plant Design and Costing"]},{"code":"115601","names":["Bakery Technology"]},{"code":"115602","names":["Harvesting, Processing and Preservation of Spices and Plantation Crops"]},{"code":"115603","names":["Meat, Fish and Poultry Processing"]},{"code":"115605","names":["NPTEL Courses- I Lab"]},{"code":"115606","names":["Food Plant Design and Layout"]},{"code":"116601","names":["Aerodynamics - I"]},{"code":"116602","names":["Heat Transfer: Aerospace Application"]},{"code":"116603","names":["Aircraft Systems and Instruments"]},{"code":"116604","names":["Finite Element Method"]},{"code":"116608","names":["Helicopter Engineering"]},{"code":"117601","names":["Robotic Programming and Software Development"]},{"code":"117602","names":["Bio MEMS"]},{"code":"117603","names":["Signal Conditioning and Data Acquisition System"]},{"code":"117606","names":["Radiological Equipment"]},{"code":"118601","names":["3D Rigging"]},{"code":"118602","names":["3D Lighting"]},{"code":"118603","names":["Character Animation"]},{"code":"118607","names":["Game Development"]}],"7":[{"code":"100708","names":["Biology for Engineers"]},{"code":"100714","names":["Human Resource Development and Organizational Behavior"]},{"code":"106704","names":["Mobile and Wireless Computing"]},{"code":"106715","names":["E-Commerce and ERP"]},{"code":"107701","names":["Chemical Reaction Engineering"]},{"code":"107702","names":["Theory of Leather supplements & Synthetics"]},{"code":"107703","names":["Leather Product Technology-II"]},{"code":"107708","names":["Organic Chemistry"]},{"code":"111701","names":["Intelligent Instrumentation"]},{"code":"111702","names":["Industrial Safety Management"]},{"code":"111703","names":["Fundamental of Mechatronics"]},{"code":"112701","names":["Safety in Power Generation Plants"]},{"code":"112702","names":["Modelling & Simulation of Fires in Structures and Enclosures"]},{"code":"112703","names":["Fire Safety in Textile Industry"]},{"code":"112705","names":["Fire Safety, Health & Environmental Laws"]},{"code":"113701","names":["Mine Hazard and Rescue"]},{"code":"113702","names":["Advanced Surface Mining"]},{"code":"113705","names":["Mine Closure Planning"]},{"code":"114701","names":["Mass Transfer Operations"]},{"code":"114704","names":["Membrane Technology"]},{"code":"115701","names":["Food Biotechnology"]},{"code":"115704","names":["Beverage Technology"]},{"code":"116701","names":["Flight Vehicle Design"]},{"code":"116704","names":["Aviation Fuels and Combustion"]},{"code":"116708","names":["Aircraft Systems and Avionics"]},{"code":"117701","names":["Machine Learning and AI for Healthcare"]},{"code":"117704","names":["Artificial Organ & Rehabilitation Engineering"]},{"code":"118701","names":["Cinematography (Photography, Videography)"]},{"code":"118702","names":["Rendering"]}],"8":[{"code":"100812","names":["Cyber security"]},{"code":"106801","names":["Artificial Intelligence"]},{"code":"106806","names":["Management Information System"]},{"code":"106813","names":["Simulation and Modelling"]},{"code":"107801","names":["Practices of Leather manufacturing -III"]},{"code":"107802","names":["Tannery waste management"]},{"code":"107803","names":["MOOCS/SWAYAM/NPTEL Courses - III"]},{"code":"107806","names":["Surface and colloid chemistry"]},{"code":"107815","names":["Leather Product Technology -III"]}]}};
+    const branchSelect = document.getElementById('branchSelect');
+    const semSelect = document.getElementById('semSelect');
+    const results = document.getElementById('results');
+    branchSelect.addEventListener('change', () => {
+      const b = branchSelect.value;
+      if (b) {
+        semSelect.disabled = false;
+      } else {
+        semSelect.disabled = true;
+        semSelect.value = '';
+        results.classList.add('hidden');
+        results.innerHTML = '';
+      }
+      update();
+    });
+    const BRANCH_LABEL = {
+      'Computer Science & Engineering': 'Computer Science & Engg. (105)',
+      'Electronic and communication Engineering': 'Electronics & Comm. Engg. (104)',
+      'Civil Engineering': 'Civil Engg. (101)',
+      'Electrical & Electronics Engineering': 'Electrical and Electronics Engg. (110)',
+      'Electrical Engineering': 'Electrical Engg. (103)',
+      'Mechanical Engineering': 'Mechanical Engg. (102)',
+      'Others': 'Others'
+    };
+    const esc = t => String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    semSelect.addEventListener('change', update);
+    function update() {
+      const b = branchSelect.value;
+      const s = semSelect.value;
+      results.innerHTML = '';
+      if (!b || !s) {
+        results.classList.add('hidden');
+        return;
+      }
+      const semNum = parseInt(s);
+      const branchData = data[b];
+      if (!branchData || !branchData[semNum]) {
+        results.classList.add('hidden');
+        return;
+      }
+      let html = '<p class="note">Note: Subject names ending with <span class="old">(OLD)</span> are highlighted in YELLOW (Before 2024 batch&#39;s subject name of that particular subject code).</p>';
+      html += '<div class="res-title">SEMESTER - ' + s + '</div>';
+      html += '<div class="res-branch">Branch: ' + esc(BRANCH_LABEL[b] || b) + '</div>';
+      html += '<div class="table-wrap"><table class="res-table"><thead><tr><th>Code</th><th>Subject Name(s)</th></tr></thead><tbody>';
+      branchData[semNum].forEach(e => {
+        const segs = e.names.map(n =>
+          n.endsWith('(OLD)') ? '<span class="old">' + esc(n) + '</span>' : esc(n)
+        ).join(' / ');
+        html += '<tr><td class="tcode">' + esc(e.code) + '</td><td>' + segs + '</td></tr>';
+      });
+      html += '</tbody></table></div>';
+      results.innerHTML = html;
+      results.classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>

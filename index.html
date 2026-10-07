@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Spidy Study PYQS - Previous year question papers, semester wise." />
+<title>Spidy Study PYQS</title>
+
+<style>
+/* =========================================================
+   0. DESIGN TOKENS + RESET
+   ========================================================= */
+:root{
+  --bg:            #05060f;              /* deep navy/black base            */
+  --surface:       rgba(255,255,255,.06); /* glass surface tint              */
+  --border:        rgba(255,255,255,.12); /* thin hairline borders           */
+  --text:          #eef2ff;              /* primary text                    */
+  --muted:         #8b93a7;              /* secondary / footer text         */
+  --violet:        #a78bfa;
+  --cyan:          #22d3ee;
+  --pink:          #f472b6;
+  --radius:        16px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+
+html{
+  scroll-behavior:smooth;
+  -webkit-text-size-adjust:100%;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:var(--font);
+  color:var(--text);
+  background:
+    radial-gradient(1200px 700px at 80% -10%, rgba(124,58,237,.22), transparent 60%),
+    radial-gradient(900px 600px at 0% 110%, rgba(6,182,212,.18), transparent 60%),
+    var(--bg);
+  overflow-x:hidden;
+  line-height:1.5;
+}
+
+img,svg{ display:block; }
+
+a{ color:inherit; text-decoration:none; }
+
+/* =========================================================
+   1. ANIMATED GRADIENT MESH BACKGROUND (blurred blobs)
+   ========================================================= */
+.mesh{
+  position:fixed;
+  inset:0;
+  z-index:-2;          /* sits behind all page content        */
+  overflow:hidden;
+  pointer-events:none;
+}
+
+.blob{
+  position:absolute;
+  width:46vw;
+  height:46vw;
+  min-width:300px;
+  min-height:300px;
+  border-radius:50%;
+  filter:blur(75px);
+  opacity:.45;
+  mix-blend-mode:screen;
+  will-change:transform;
+}
+
+.blob--violet{
+  top:-12%; left:-10%;
+  background:radial-gradient(circle at 35% 35%, #7c3aed, transparent 70%);
+  animation:drift-a 26s ease-in-out infinite alternate;
+}
+.blob--cyan{
+  top:10%; right:-15%;
+  background:radial-gradient(circle at 50% 50%, #06b6d4, transparent 70%);
+  animation:drift-b 32s ease-in-out infinite alternate;
+}
+.blob--pink{
+  bottom:-18%; left:15%;
+  background:radial-gradient(circle at 50% 50%, #ec4899, transparent 70%);
+  animation:drift-c 28s ease-in-out infinite alternate;
+}
+.blob--blue{
+  bottom:5%; right:5%;
+  background:radial-gradient(circle at 50% 50%, #2563eb, transparent 70%);
+  animation:drift-d 36s ease-in-out infinite alternate;
+}
+
+@keyframes drift-a{
+  from{ transform:translate3d(0,0,0)      scale(1);   }
+  to  { transform:translate3d(14vw,10vh,0) scale(1.2); }
+}
+@keyframes drift-b{
+  from{ transform:translate3d(0,0,0)       scale(1.05); }
+  to  { transform:translate3d(-12vw,14vh,0) scale(.9);  }
+}
+@keyframes drift-c{
+  from{ transform:translate3d(0,0,0)       scale(.95); }
+  to  { transform:translate3d(10vw,-12vh,0) scale(1.25);}
+}
+@keyframes drift-d{
+  from{ transform:translate3d(0,0,0)       scale(1.1); }
+  to  { transform:translate3d(-14vw,-8vh,0) scale(.95); }
+}
+
+/* =========================================================
+   2. SUBTLE GRID + DOT PATTERN OVERLAY
+   ========================================================= */
+.pattern{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background-image:
+    /* fine dots */
+    radial-gradient(rgba(255,255,255,.10) 1px, transparent 1px),
+    /* grid lines */
+    linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+  background-size:22px 22px, 88px 88px, 88px 88px;
+  background-position:0 0, 0 0, 0 0;
+  -webkit-mask-image:radial-gradient(ellipse at 50% 35%, #000 25%, transparent 78%);
+          mask-image:radial-gradient(ellipse at 50% 35%, #000 25%, transparent 78%);
+}
+
+/* =========================================================
+   3. ENTRANCE ANIMATION (fade-in + slide-up)
+   NOTE: fill-mode "backwards" only, so the finished
+   animation never blocks :hover transforms on the cards.
+   ========================================================= */
+@keyframes rise{
+  from{ opacity:0; transform:translateY(26px); }
+  to  { opacity:1; transform:translateY(0);    }
+}
+
+/* =========================================================
+   4. HEADER — glassmorphism bar
+   ========================================================= */
+.site-header{
+  position:sticky;
+  top:0;
+  z-index:20;
+  padding:.85rem 1.25rem;
+  background:rgba(10,12,24,.55);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+          backdrop-filter:blur(14px) saturate(140%);
+  border-bottom:1px solid var(--border);
+  animation:rise .7s cubic-bezier(.22,.8,.28,1) backwards;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.65rem;
+}
+
+/* neon glowing spider icon + gentle float */
+.spider{
+  width:40px;
+  height:40px;
+  color:var(--cyan);
+  filter:
+    drop-shadow(0 0 5px  rgba(34,211,238,.9))
+    drop-shadow(0 0 16px rgba(167,139,250,.6));
+  animation:float 5s ease-in-out infinite;
+}
+
+@keyframes float{
+  0%,100%{ transform:translateY(0)    rotate(-3deg); }
+  50%    { transform:translateY(-7px) rotate(3deg);  }
+}
+
+.brand-name{
+  font-size:1.05rem;
+  font-weight:800;
+  letter-spacing:.02em;
+  text-shadow:0 0 18px rgba(167,139,250,.45);
+}
+
+/* =========================================================
+   5. LAYOUT CONTAINER
+   ========================================================= */
+.container{
+  width:min(1100px, 100% - 2.5rem);
+  margin-inline:auto;
+  position:relative;
+  z-index:1;
+}
+
+main{ position:relative; z-index:1; }
+
+/* =========================================================
+   6. HERO TEXT
+   ========================================================= */
+.hero{
+  text-align:center;
+  padding:clamp(2.75rem, 9vw, 5.5rem) 0 clamp(1.75rem, 5vw, 3rem);
+}
+
+.hero h1{
+  margin:0 auto;
+  max-width:16ch;
+  font-size:clamp(1.9rem, 7vw, 3.5rem);
+  font-weight:800;
+  line-height:1.12;
+  letter-spacing:-.02em;
+
+  /* purple -> cyan -> pink gradient text */
+  background-image:linear-gradient(110deg, #a78bfa 0%, #22d3ee 45%, #f472b6 75%, #a78bfa 100%);
+  background-size:220% 100%;
+  -webkit-background-clip:text;
+          background-clip:text;
+  -webkit-text-fill-color:transparent;
+          color:transparent;
+  animation:
+    rise .75s cubic-bezier(.22,.8,.28,1) .12s backwards,
+    gradient-pan 9s linear infinite;
+}
+
+@keyframes gradient-pan{
+  from{ background-position:0% 50%; }
+  to  { background-position:200% 50%; }
+}
+
+.hero p{
+  margin:1rem 0 0;
+  color:var(--muted);
+  font-size:clamp(.85rem, 2.6vw, 1.05rem);
+  font-weight:600;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  animation:rise .75s cubic-bezier(.22,.8,.28,1) .24s backwards;
+}
+
+/* =========================================================
+   7. SEMESTER CARDS — CSS grid (mobile-first: 2 cols)
+   ========================================================= */
+.cards{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:clamp(.75rem, 2.5vw, 1.25rem);
+  padding-bottom:3rem;
+}
+
+.card{
+  /* default accent (overridden per card below) */
+  --accent:167 139 250;
+
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:.7rem;
+  min-height:118px;
+  padding:1.5rem .6rem 1.2rem;
+  border-radius:var(--radius);
+
+  /* glass fill + 1px gradient border, in one shot */
+  border:1px solid transparent;
+  background:
+    linear-gradient(160deg, rgba(255,255,255,.075), rgba(255,255,255,.02)) padding-box,
+    linear-gradient(160deg, rgb(var(--accent) / .65), rgba(255,255,255,.07) 60%) border-box;
+  -webkit-backdrop-filter:blur(14px);
+          backdrop-filter:blur(14px);
+
+  box-shadow:0 8px 24px rgba(0,0,0,.35);
+  text-align:center;
+
+  transition:
+    transform       .35s cubic-bezier(.22,.8,.28,1),
+    box-shadow      .35s ease,
+    background      .35s ease;
+  animation:rise .65s cubic-bezier(.22,.8,.28,1) calc(.38s + var(--i,1) * .07s) backwards;
+}
+
+/* semester number badge */
+.badge{
+  font-size:.68rem;
+  font-weight:800;
+  letter-spacing:.1em;
+  padding:.22rem .6rem;
+  border-radius:999px;
+  color:rgb(var(--accent));
+  background:rgb(var(--accent) / .12);
+  border:1px solid rgb(var(--accent) / .4);
+  text-shadow:0 0 10px rgb(var(--accent) / .7);
+}
+
+.card-title{
+  font-size:clamp(.95rem, 3.4vw, 1.1rem);
+  font-weight:800;
+  letter-spacing:.01em;
+}
+
+/* ---- hover / tap: lift + scale + neon glow + brighter border ---- */
+.card:hover,
+.card:focus-visible{
+  transform:translateY(-9px) scale(1.03);
+  background:
+    linear-gradient(160deg, rgba(255,255,255,.13), rgba(255,255,255,.04)) padding-box,
+    linear-gradient(160deg, rgb(var(--accent) / 1), rgb(var(--accent) / .35)) border-box;
+  box-shadow:
+    0 18px 38px rgba(0,0,0,.45),
+    0 0 26px -4px rgb(var(--accent) / .65),
+    inset 0 0 22px -14px rgb(var(--accent) / .9);
+}
+
+.card:active{ transform:translateY(-4px) scale(1.015); }
+
+.card:focus-visible{
+  outline:2px solid rgb(var(--accent));
+  outline-offset:3px;
+}
+
+/* ---- per-card accent colours + stagger index ---- */
+.card:nth-child(1){ --accent:167 139 250; --i:1; } /* violet */
+.card:nth-child(2){ --accent: 34 211 238; --i:2; } /* cyan   */
+.card:nth-child(3){ --accent:244 114 182; --i:3; } /* pink   */
+.card:nth-child(4){ --accent:163 230  53; --i:4; } /* lime   */
+.card:nth-child(5){ --accent:251 191  36; --i:5; } /* amber  */
+.card:nth-child(6){ --accent:251 146  60; --i:6; } /* orange */
+.card:nth-child(7){ --accent: 96 165 250; --i:7; } /* blue   */
+.card:nth-child(8){ --accent: 45 212 191; --i:8; } /* teal   */
+
+/* =========================================================
+   8. FOOTER
+   ========================================================= */
+.site-footer{
+  position:relative;
+  z-index:1;
+  padding:1.5rem 1rem 2.25rem;
+  text-align:center;
+  color:var(--muted);
+  font-size:.8rem;
+  font-weight:700;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  border-top:1px solid rgba(255,255,255,.06);
+  animation:rise .7s cubic-bezier(.22,.8,.28,1) .9s backwards;
+}
+
+/* second footer line + heart symbol */
+.footer-line{
+  display:block;
+  margin-top:.35rem;
+  font-size:.95rem;
+  letter-spacing:.34em;
+  background:linear-gradient(90deg,var(--pink),var(--violet),var(--cyan));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.heart{
+  display:inline-block;
+  color:#f472b6;
+  text-shadow:0 0 10px rgba(244,114,182,.8);
+  animation:beat 1.6s ease-in-out infinite;
+}
+
+@keyframes beat{
+  0%,100%{ transform:scale(1);   }
+  25%    { transform:scale(1.18);}
+  40%    { transform:scale(1);   }
+  60%    { transform:scale(1.12);}
+}
+
+/* =========================================================
+   9. RESPONSIVE — 4 columns from tablet upward
+   ========================================================= */
+@media (min-width:720px){
+  .cards{
+    grid-template-columns:repeat(4, 1fr);
+  }
+  .card{ min-height:132px; }
+  .brand-name{ font-size:1.2rem; }
+}
+
+@media (min-width:1024px){
+  .hero{ padding-top:clamp(4rem, 8vw, 6.5rem); }
+}
+
+/* =========================================================
+   10. ACCESSIBILITY — respect reduced motion
+   ========================================================= */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+    scroll-behavior:auto !important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+  <!-- Animated gradient mesh blobs -->
+  <div class="mesh" aria-hidden="true">
+    <span class="blob blob--violet"></span>
+    <span class="blob blob--cyan"></span>
+    <span class="blob blob--pink"></span>
+    <span class="blob blob--blue"></span>
+  </div>
+
+  <!-- Grid + dot pattern overlay -->
+  <div class="pattern" aria-hidden="true"></div>
+
+  <!-- ============ HEADER ============ -->
+  <header class="site-header">
+    <div class="brand">
+      <!-- Simple neon spider icon (~40px) -->
+      <svg class="spider" viewBox="0 0 64 64" role="img" aria-label="Spider icon">
+        <g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+          <path d="M25 31 C17 29 12 23 7 18"/>
+          <path d="M25 35 C15 35 10 33 5 30"/>
+          <path d="M25 39 C15 41 10 45 6 50"/>
+          <path d="M25 43 C17 47 13 53 10 58"/>
+          <path d="M39 31 C47 29 52 23 57 18"/>
+          <path d="M39 35 C49 35 54 33 59 30"/>
+          <path d="M39 39 C49 41 54 45 58 50"/>
+          <path d="M39 43 C47 47 51 53 54 58"/>
+        </g>
+        <ellipse cx="32" cy="39" rx="7.5" ry="9"  fill="currentColor"/>
+        <circle  cx="32" cy="28" r="5"     fill="currentColor"/>
+        <circle  cx="30" cy="27" r="1"     fill="#05060f"/>
+        <circle  cx="34" cy="27" r="1"     fill="#05060f"/>
+      </svg>
+      <span class="brand-name">Spidy Study PYQS</span>
+    </div>
+  </header>
+
+  <!-- ============ MAIN ============ -->
+  <main class="container">
+
+    <!-- Hero -->
+    <section class="hero">
+      <h1>Welcome to Spidy Study PYQS</h1>
+    </section>
+
+    <!-- Semester cards -->
+    <nav class="cards" aria-label="Choose a semester">
+      <a class="card" href="pyqs.html"><span class="badge">PY</span><span class="card-title">PYQS</span></a>
+      <a class="card" href="syllabus.html"><span class="badge">SY</span><span class="card-title">Syllabus</span></a>
+      <a class="card" href="https://t.me/o_spidy" target="_blank" rel="noopener"><span class="badge">LB</span><span class="card-title">Library</span></a>
+      <a class="card" href="https://beu-bih.ac.in/result-one" target="_blank" rel="noopener"><span class="badge">RS</span><span class="card-title">Results</span></a>
+      <a class="card" href="calendar.html"><span class="badge">CL</span><span class="card-title">Calendar</span></a>
+      <a class="card" href="donate.html"><span class="badge">DN</span><span class="card-title">Donate</span></a>
+    </nav>
+
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    MADE FOR STUDENTS
+    <span class="footer-line">WITH <span class="heart" aria-hidden="true">&#10084;</span> BY SPIDY</span>
+  </footer>
+
+</body>
+</html>
